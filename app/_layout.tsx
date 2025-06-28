@@ -18,7 +18,12 @@ export default function RootLayout() {
   }
 
   return (
+    
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <meta property="og:title" content="Alex y Erick ♡ 30 de Mayo del 2026" />
+    <meta property="og:description" content="Save the date! 30 - 5 - 202" />
+    <meta property="og:image" content={require('@/assets/images/saveTheDate.png')} />
+    <meta property="og:url" content="https://alexyerick.com" />
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />

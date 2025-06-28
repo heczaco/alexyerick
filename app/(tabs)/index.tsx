@@ -4,7 +4,10 @@ import { StyleSheet } from 'react-native';
 export default function HomeScreen() {
 
     return(
-      <Image source={require('@/assets/images/saveTheDate.png')} />
+      <Image 
+        style={{ flex: 1, width: undefined, height: undefined, resizeMode: 'contain' }}
+        source={require('@/assets/images/saveTheDate.png')} 
+      />
       
     );  
 /*return (
