@@ -1,79 +1,41 @@
-import { Image } from 'expo-image';
-import { StyleSheet } from 'react-native';
+import React from "react";
+import { Image, StyleSheet, View } from "react-native";
 
 export default function HomeScreen() {
 
-    return(
-      <Image 
-        style={{ flex: 1, width: undefined, height: undefined, resizeMode: 'contain' }}
-        source={require('@/assets/images/saveTheDate.png')} 
+  return (
+    <View style={styles.container}>
+      <iframe 
+        height="75%" 
+        src="https://www.youtube.com/embed/velNa1Or318?autoplay=1&loop=1&playlist=velNa1Or318" 
+        title="Save the Date Alex & Erick"
+        allow="autoplay; web-share"
+        style={{
+          border: 'none',
+          borderRadius: '10px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+          aspectRatio: '9/16',
+        }}
       />
-      
-    );  
-/*return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );*/
-
+      <Image 
+        style={styles.bannerImage}
+        source={require('@/assets/images/banner_saveTheDate.png')} 
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    paddingTop: '3%',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: '#000',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  bannerImage: {
+    height: '20%',
+    width: '90%',
+    resizeMode: 'contain',
+    marginTop: '3%',
   },
 });
