@@ -1,5 +1,16 @@
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import {
+  Raleway_100Thin,
+  Raleway_200ExtraLight,
+  Raleway_300Light,
+  Raleway_400Regular,
+  Raleway_500Medium,
+  Raleway_600SemiBold,
+  Raleway_700Bold,
+  Raleway_800ExtraBold,
+  Raleway_900Black,
+} from '@expo-google-fonts/raleway';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -10,6 +21,15 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    Raleway_100Thin,
+    Raleway_200ExtraLight,
+    Raleway_300Light,
+    Raleway_400Regular,
+    Raleway_500Medium,
+    Raleway_600SemiBold,
+    Raleway_700Bold,
+    Raleway_800ExtraBold,
+    Raleway_900Black,
   });
 
   if (!loaded) {

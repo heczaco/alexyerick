@@ -7,9 +7,11 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <iframe 
         height="75%" 
-        src="https://www.youtube.com/embed/velNa1Or318?autoplay=1&loop=1&playlist=velNa1Or318" 
+        src="https://www.youtube.com/embed/velNa1Or318?autoplay=1&mute=1&loop=1&playlist=velNa1Or318&controls=1&modestbranding=1&rel=0" 
         title="Save the Date Alex & Erick"
-        allow="autoplay; web-share"
+        allow="autoplay; encrypted-media; web-share"
+        allowFullScreen
+        frameBorder="0"
         style={{
           border: 'none',
           borderRadius: '10px',
