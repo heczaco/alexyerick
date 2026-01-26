@@ -39,6 +39,12 @@ async def startup_event():
         sheets_service.connect()
         invitations = sheets_service.update_invitations()  # Test connection
         print(invitations)
+        for key, item in invitations.items():
+            try:
+                guests = sheets_service.update_guest_list(key)
+                print(guests)
+            except Exception as e:
+                print(f"Error updating guest list for {key}: {e}")
         print("✓ Connected to Google Sheets")
         print(f"✓ Loaded {len(invitations)} invitations from the spreadsheet")
     except Exception as e:

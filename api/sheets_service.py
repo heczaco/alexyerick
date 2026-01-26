@@ -46,11 +46,9 @@ class GoogleSheetsService:
             for row in all_rows[1:]:  # Skip header row
                 if len(row) >= 3:
                     prefix = row[1]
-                    sheet_connection = self.client.open_by_key(row[2])
                     invitations[prefix] = {
                         "boda": row[0],
                         "google_sheet_id": row[2],
-                        "sheet_connection": sheet_connection,
                         "guest_list": {}
                     }
             self.invitations = invitations
@@ -58,28 +56,43 @@ class GoogleSheetsService:
         except Exception as e:
             raise Exception(f"Error converting table to invitations: {str(e)}")
 
-
     def update_guest_list(self, prefix: str) -> dict:
         """Updates the guest list for a specific invitation prefix"""
         try:
+
             invitation = self.invitations.get(prefix)
             if not invitation:
                 raise Exception(f"No invitation found for prefix: {prefix}")
-
-            sheet_connection = invitation["sheet_connection"]
-            worksheet = sheet_connection.worksheet("guests")
-            all_rows = worksheet.get_all_values()
-
-            guest_list = {}
+            
+            self.sheet = self.client.open_by_key(self.invitations[prefix]["google_sheet_id"])
+            sheet_connection = self.sheet.worksheet("guests")
+            all_rows = sheet_connection.get_all_values()
+            if not all_rows or len(all_rows) < 2:
+                return {}
+            # Get headers from first row
+            headers = all_rows[0]
+            # Find uuid column index
+            try:
+                uuid_index = headers.index("uuid")
+            except ValueError:
+                raise Exception("No 'uuid' column found in the sheet")
+            # Filter headers to exclude those starting with underscore
+            valid_columns = [
+                (i, header) for i, header in enumerate(headers) 
+                if not header.startswith("_")
+            ]
+            guests = {}
             for row in all_rows[1:]:  # Skip header row
-                if len(row) >= 3:
-                    guest_id = row[0]
-                    guest_email = row[2]
-                    guest_list[guest_email] = {
-                        "id": guest_id,
-                        "row_data": row
-                    }
-            invitation["guest_list"] = guest_list
-            return guest_list
+                if len(row) > uuid_index and row[uuid_index]:
+                    uuid_key = row[uuid_index]
+                    guest_data = {}
+                    for col_index, col_name in valid_columns:
+                        if col_index < len(row):
+                            guest_data[col_name] = row[col_index]
+                        else:
+                            guest_data[col_name] = ""
+                    guests[uuid_key] = guest_data
+            invitation["guest_list"] = guests
+            return guests
         except Exception as e:
             raise Exception(f"Error updating guest list for prefix {prefix}: {str(e)}")
