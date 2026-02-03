@@ -1,20 +1,42 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from typing import List, Optional
 import os
 from dotenv import load_dotenv
 
-from models import Guest, GuestCreate, GuestUpdate, RSVPResponse
+from models import *
 from sheets_service import GoogleSheetsService
+from custom_fast_api import CustomFastAPI
 
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(
-    title="Wedding E-Vite API",
-    description="API for managing wedding guests using Google Sheets as database",
-    version="1.0.0"
-)
+
+@asynccontextmanager
+async def lifespan(app: CustomFastAPI):
+    """Initialize the Google Sheets connection on startup"""
+    try:
+        sheets_service.connect()
+        app.invitations = sheets_service.update_invitations()  # Test connection
+        for key, item in app.invitations.items():
+            try:
+                guests = sheets_service.update_guest_list(key)
+                print(guests)
+            except Exception as e:
+                print(f"Error updating guest list for {key}: {e}")
+        print("✓ Connected to Google Sheets")
+        print(f"✓ Loaded {len(app.invitations)} invitations from the spreadsheet")
+    except Exception as e:
+        print(f"✗ Failed to connect to Google Sheets: {e}")
+    yield
+    # Clean up the ML models and release the resources
+    # clean yp any code here
+
+app = CustomFastAPI(title="Heczaco's wedding E-Vite API",
+                    description="wedding invitation management API using Google Sheets as the backend",
+                    version="1.0.0",
+                    lifespan=lifespan)
 
 # Configure CORS
 app.add_middleware(
@@ -32,25 +54,6 @@ sheets_service = GoogleSheetsService(
 )
 
 
-@app.on_event("startup")
-async def startup_event():
-    """Initialize the Google Sheets connection on startup"""
-    try:
-        sheets_service.connect()
-        invitations = sheets_service.update_invitations()  # Test connection
-        print(invitations)
-        for key, item in invitations.items():
-            try:
-                guests = sheets_service.update_guest_list(key)
-                print(guests)
-            except Exception as e:
-                print(f"Error updating guest list for {key}: {e}")
-        print("✓ Connected to Google Sheets")
-        print(f"✓ Loaded {len(invitations)} invitations from the spreadsheet")
-    except Exception as e:
-        print(f"✗ Failed to connect to Google Sheets: {e}")
-
-
 @app.get("/")
 async def root():
     """Health check endpoint"""
@@ -60,142 +63,32 @@ async def root():
     }
 
 
-@app.get("/api/guests", response_model=List[Guest])
-async def get_all_guests():
-    """Get all guests from the database"""
+@app.get("/activeInvitations")
+async def get_active_invitations():
+    """Get all active invitations"""
     try:
-        guests = sheets_service.get_all_guests()
-        return guests
+        invitations = app.invitations
+        return invitations
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching guests: {str(e)}"
+            detail=f"Error fetching invitations: {str(e)}"
         )
 
 
-@app.get("/api/guests/{guest_id}", response_model=Guest)
-async def get_guest(guest_id: str):
-    """Get a specific guest by ID"""
+@app.post("/api/guests_ids", response_model=InfoInvitation)
+async def create_guest_ids(invitation: InvitationData):
+    """Create a new invitation entry"""
     try:
-        guest = sheets_service.get_guest_by_id(guest_id)
-        if not guest:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Guest with ID {guest_id} not found"
-            )
-        return guest
-    except HTTPException:
-        raise
+        # Here you would add logic to insert the new invitation into Google Sheets
+        # For now, we just return the invitation data
+        return invitation
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching guest: {str(e)}"
+            detail=f"Error creating invitation: {str(e)}"
         )
-
-
-@app.get("/api/guests/email/{email}", response_model=Guest)
-async def get_guest_by_email(email: str):
-    """Get a specific guest by email"""
-    try:
-        guest = sheets_service.get_guest_by_email(email)
-        if not guest:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Guest with email {email} not found"
-            )
-        return guest
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error fetching guest: {str(e)}"
-        )
-
-
-@app.post("/api/guests", response_model=Guest, status_code=status.HTTP_201_CREATED)
-async def create_guest(guest: GuestCreate):
-    """Create a new guest"""
-    try:
-        # Check if email already exists
-        existing_guest = sheets_service.get_guest_by_email(guest.email)
-        if existing_guest:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Guest with this email already exists"
-            )
-        
-        new_guest = sheets_service.create_guest(guest)
-        return new_guest
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error creating guest: {str(e)}"
-        )
-
-
-@app.put("/api/guests/{guest_id}", response_model=Guest)
-async def update_guest(guest_id: str, guest_update: GuestUpdate):
-    """Update a guest's information"""
-    try:
-        updated_guest = sheets_service.update_guest(guest_id, guest_update)
-        if not updated_guest:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Guest with ID {guest_id} not found"
-            )
-        return updated_guest
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error updating guest: {str(e)}"
-        )
-
-
-@app.post("/api/rsvp/{guest_id}", response_model=Guest)
-async def update_rsvp(guest_id: str, rsvp_data: RSVPResponse):
-    """Update guest's RSVP status"""
-    try:
-        updated_guest = sheets_service.update_rsvp(guest_id, rsvp_data)
-        if not updated_guest:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Guest with ID {guest_id} not found"
-            )
-        return updated_guest
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error updating RSVP: {str(e)}"
-        )
-
-
-@app.delete("/api/guests/{guest_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_guest(guest_id: str):
-    """Delete a guest"""
-    try:
-        success = sheets_service.delete_guest(guest_id)
-        if not success:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Guest with ID {guest_id} not found"
-            )
-        return None
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error deleting guest: {str(e)}"
-        )
-
-
+    
 @app.get("/api/stats")
 async def get_stats():
     """Get statistics about guests and RSVPs"""

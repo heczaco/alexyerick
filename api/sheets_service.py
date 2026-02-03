@@ -4,7 +4,6 @@ from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime
 
-from models import Guest, GuestCreate, GuestUpdate, RSVPResponse
 
 
 class GoogleSheetsService:
@@ -63,7 +62,7 @@ class GoogleSheetsService:
             invitation = self.invitations.get(prefix)
             if not invitation:
                 raise Exception(f"No invitation found for prefix: {prefix}")
-            
+
             self.sheet = self.client.open_by_key(self.invitations[prefix]["google_sheet_id"])
             sheet_connection = self.sheet.worksheet("guests")
             all_rows = sheet_connection.get_all_values()
@@ -96,3 +95,119 @@ class GoogleSheetsService:
             return guests
         except Exception as e:
             raise Exception(f"Error updating guest list for prefix {prefix}: {str(e)}")
+
+    def create_uuids(self, prefix: str,
+                     obligatory_headers: list[str] = ["Nombre Principal", "Telefono"]) -> tuple[int, int]:
+        """Generates new UUIDs and returns a tuple of (uuids_created, total_guests_with_uuid)"""
+        try:
+            invitation = self.invitations.get(prefix)
+            if not invitation:
+                raise Exception(f"No invitation found for prefix: {prefix}")
+
+            self.sheet = self.client.open_by_key(invitation["google_sheet_id"])
+            worksheet = self.sheet.worksheet("guests")
+            all_rows = worksheet.get_all_values()
+
+            if not all_rows:
+                raise Exception("Sheet is empty")
+
+            headers = all_rows[0]
+
+            # Find indices for obligatory headers and uuid
+            try:
+                uuid_index = headers.index("uuid")
+            except ValueError:
+                raise Exception("No 'uuid' column found in the sheet")
+
+            obligatory_indices = []
+            for header in obligatory_headers:
+                try:
+                    obligatory_indices.append(headers.index(header))
+                except ValueError:
+                    raise Exception(f"Obligatory header '{header}' not found in sheet")
+
+            # Process each row (skip header)
+            updates = []
+            existing_uuids = 0
+            for row_num, row in enumerate(all_rows[1:], start=2):
+                # Check if uuid is empty
+                has_uuid = len(row) > uuid_index and row[uuid_index].strip()
+
+                # Check if all obligatory fields are filled
+                has_all_obligatory = all(
+                    len(row) > idx and row[idx].strip() 
+                    for idx in obligatory_indices
+                )
+
+                # If has all obligatory fields but no uuid, generate one
+                if has_all_obligatory and not has_uuid:
+                    new_uuid = str(uuid.uuid4())
+                    updates.append({
+                        'range': f'{chr(65 + uuid_index)}{row_num}',  # Convert column index to letter
+                        'values': [[new_uuid]]
+                    })
+                elif has_uuid:
+                    existing_uuids += 1
+
+            # Batch update all rows that need UUIDs
+            if updates:
+                worksheet.batch_update(updates)
+            
+            uuids_created = len(updates)
+            total_guests = existing_uuids + uuids_created
+            return (uuids_created, total_guests)
+
+        except Exception as e:
+            raise Exception(f"Error creating UUIDs for prefix {prefix}: {str(e)}")
+        
+    def rsvp_guest(self, prefix: str, uuid: str, confirmed_guests:int, message: Optional[str] = None) -> None:
+        """Updates the RSVP status of a guest identified by UUID"""
+        try:
+            invitation = self.invitations.get(prefix)
+            if not invitation:
+                raise Exception(f"No invitation found for prefix: {prefix}")
+
+            self.sheet = self.client.open_by_key(invitation["google_sheet_id"])
+            worksheet = self.sheet.worksheet("guests")
+            all_rows = worksheet.get_all_values()
+
+            if not all_rows:
+                raise Exception("Sheet is empty")
+
+            headers = all_rows[0]
+
+            # Find indices for uuid, RSVP status, confirmed guests, and message
+            try:
+                uuid_index = headers.index("uuid")
+                rsvp_index = headers.index("RSVP Status")
+                confirmed_index = headers.index("Confirmed Guests")
+                message_index = headers.index("Message")
+            except ValueError as ve:
+                raise Exception(f"Required column not found: {str(ve)}")
+
+            # Find the row with the matching UUID
+            for row_num, row in enumerate(all_rows[1:], start=2):
+                if len(row) > uuid_index and row[uuid_index] == uuid:
+                    # Update RSVP status and confirmed guests
+                    updates = []
+                    updates.append({
+                        'range': f'{chr(65 + rsvp_index)}{row_num}',
+                        'values': [["Confirmed"]]
+                    })
+                    updates.append({
+                        'range': f'{chr(65 + confirmed_index)}{row_num}',
+                        'values': [[str(confirmed_guests)]]
+                    })
+                    if message is not None:
+                        updates.append({
+                            'range': f'{chr(65 + message_index)}{row_num}',
+                            'values': [[message]]
+                        })
+                    # Batch update the row
+                    worksheet.batch_update(updates)
+                    return
+
+            raise Exception(f"No guest found with UUID: {uuid}")
+
+        except Exception as e:
+            raise Exception(f"Error updating RSVP for UUID {uuid} in prefix {prefix}: {str(e)}")
