@@ -77,18 +77,41 @@ async def get_active_invitations():
 
 
 @app.post("/api/guests_ids", response_model=InfoInvitation)
-async def create_guest_ids(invitation: InvitationData):
+async def create_guest_ids(invitation: eViteInfo):
     """Create a new invitation entry"""
     try:
         # Here you would add logic to insert the new invitation into Google Sheets
         # For now, we just return the invitation data
-        return invitation
+        if invitation.prefix not in app.invitations:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Invitation with prefix {invitation.prefix} not found"
+            )
+        elif invitation.google_sheet_id != app.invitations[invitation.prefix]["google_sheet_id"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Google Sheet ID does not match for prefix {invitation.prefix}"
+            )
+        tags = app.invitations[invitation.prefix].get("tags", None)
+        if tags is None or tags.get("mandatory_fields", []) == []:
+            info = sheets_service.create_uuids(invitation.prefix)
+        else:
+            info = sheets_service.create_uuids(invitation.prefix, tags["mandatory_fields"].split(";"))
+        app.invitations[invitation.prefix]["guest_list"] = sheets_service.update_guest_list(invitation.prefix)
+
+        return InfoInvitation(
+            prefix=invitation.prefix,
+            boda=invitation.boda,
+            google_sheet_id=invitation.google_sheet_id,
+            created_ids=info[0],
+            num_guests=info[1]
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error creating invitation: {str(e)}"
         )
-    
+
 @app.get("/api/stats")
 async def get_stats():
     """Get statistics about guests and RSVPs"""

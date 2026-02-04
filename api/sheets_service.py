@@ -1,9 +1,9 @@
 import gspread
+from gspread.exceptions import WorksheetNotFound
 from google.oauth2.service_account import Credentials
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime
-
 
 
 class GoogleSheetsService:
@@ -12,10 +12,9 @@ class GoogleSheetsService:
     def __init__(self, credentials_file: str, spreadsheet_id: str):
         self.credentials_file = credentials_file
         self.spreadsheet_id = spreadsheet_id
-        self.client = None
+        self.client: gspread.Client
         self.sheet = None
         self.worksheet = None
-
         # Define the scope
         self.scope = [
             'https://spreadsheets.google.com/feeds',
@@ -43,14 +42,18 @@ class GoogleSheetsService:
             all_rows = self.invitationsWorksheet.get_all_values()
             invitations = {}
             for row in all_rows[1:]:  # Skip header row
-                if len(row) >= 3:
+                if len(row) >= 4 and row[3] != "FALSE":  # Ensure there are enough columns and prefix is not empty
                     prefix = row[1]
                     invitations[prefix] = {
                         "boda": row[0],
                         "google_sheet_id": row[2],
-                        "guest_list": {}
+                        "guest_list": {},
+                        "tags": {}
                     }
             self.invitations = invitations
+            # get tags for each invitation
+            for invitation in self.invitations.keys():
+                self.invitations[invitation]["tags"] = self.get_info_tags(invitation)
             return invitations
         except Exception as e:
             raise Exception(f"Error converting table to invitations: {str(e)}")
@@ -63,7 +66,8 @@ class GoogleSheetsService:
             if not invitation:
                 raise Exception(f"No invitation found for prefix: {prefix}")
 
-            self.sheet = self.client.open_by_key(self.invitations[prefix]["google_sheet_id"])
+            invitation["tags"] = self.get_info_tags(prefix)
+            self.sheet = self.client.open_by_key(invitation["google_sheet_id"])
             sheet_connection = self.sheet.worksheet("guests")
             all_rows = sheet_connection.get_all_values()
             if not all_rows or len(all_rows) < 2:
@@ -77,9 +81,16 @@ class GoogleSheetsService:
                 raise Exception("No 'uuid' column found in the sheet")
             # Filter headers to exclude those starting with underscore
             valid_columns = [
-                (i, header) for i, header in enumerate(headers) 
+                (i, header) for i, header in enumerate(headers)
                 if not header.startswith("_")
             ]
+
+            # we replace headers with tag values if they exist
+            for tag, value in invitation["tags"].items():
+                if value in headers:
+                    idx = headers.index(value)
+                    headers[idx] = (idx, tag)
+
             guests = {}
             for row in all_rows[1:]:  # Skip header row
                 if len(row) > uuid_index and row[uuid_index]:
@@ -97,7 +108,7 @@ class GoogleSheetsService:
             raise Exception(f"Error updating guest list for prefix {prefix}: {str(e)}")
 
     def create_uuids(self, prefix: str,
-                     obligatory_headers: list[str] = ["Nombre Principal", "Telefono"]) -> tuple[int, int]:
+                     mandatory_fields: list[str] = ["Nombre Principal", "Telefono"]) -> tuple[int, int]:
         """Generates new UUIDs and returns a tuple of (uuids_created, total_guests_with_uuid)"""
         try:
             invitation = self.invitations.get(prefix)
@@ -120,9 +131,9 @@ class GoogleSheetsService:
                 raise Exception("No 'uuid' column found in the sheet")
 
             obligatory_indices = []
-            for header in obligatory_headers:
+            for header in mandatory_fields:
                 try:
-                    obligatory_indices.append(headers.index(header))
+                    obligatory_indices.append(next(i for i, h in enumerate(headers) if h.lower() == header.lower()))
                 except ValueError:
                     raise Exception(f"Obligatory header '{header}' not found in sheet")
 
@@ -135,7 +146,7 @@ class GoogleSheetsService:
 
                 # Check if all obligatory fields are filled
                 has_all_obligatory = all(
-                    len(row) > idx and row[idx].strip() 
+                    len(row) > idx and row[idx].strip()
                     for idx in obligatory_indices
                 )
 
@@ -152,14 +163,43 @@ class GoogleSheetsService:
             # Batch update all rows that need UUIDs
             if updates:
                 worksheet.batch_update(updates)
-            
+
             uuids_created = len(updates)
             total_guests = existing_uuids + uuids_created
             return (uuids_created, total_guests)
 
         except Exception as e:
             raise Exception(f"Error creating UUIDs for prefix {prefix}: {str(e)}")
-        
+
+    def get_info_tags(self, prefix: str) -> dict:
+        """Reads tag/value pairs from the info sheet and returns them as a dictionary"""
+        try:
+            invitation = self.invitations.get(prefix)
+            if not invitation:
+                raise Exception(f"No invitation found for prefix: {prefix}")
+
+            self.sheet = self.client.open_by_key(invitation["google_sheet_id"])
+            worksheet = self.sheet.worksheet("info")
+            all_rows = worksheet.get_all_values()
+
+            if not all_rows or len(all_rows) < 2:
+                return {}
+
+            # Convert tag/value pairs to dictionary
+            info_dict = {}
+            for row in all_rows[1:]:  # Skip header row
+                if len(row) >= 2 and row[0]:  # Ensure we have at least tag and value
+                    tag = row[0]
+                    value = row[1]
+                    info_dict[tag] = value
+
+            return info_dict
+        except WorksheetNotFound:
+            # If the info worksheet does not exist, return empty dict
+            return {}
+        except Exception as e:
+            raise Exception(f"Error reading info tags for prefix {prefix}: {str(e)}")
+
     def rsvp_guest(self, prefix: str, uuid: str, confirmed_guests:int, message: Optional[str] = None) -> None:
         """Updates the RSVP status of a guest identified by UUID"""
         try:

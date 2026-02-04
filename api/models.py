@@ -33,6 +33,13 @@ class ActiveInvitations(RootModel):
         }
 
 
+class eViteInfo(BaseModel):
+    """Model for detailed invitation information"""
+    prefix: str = Field(..., description="Unique prefix for the invitation")
+    boda: str = Field(..., description="Name of the wedding event")
+    google_sheet_id: str = Field(..., description="Google Sheet ID associated with the invitation")
+
+
 class InfoInvitation(BaseModel):
     """Model for detailed invitation information"""
     prefix: str = Field(..., description="Unique prefix for the invitation")
