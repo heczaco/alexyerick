@@ -1,6 +1,7 @@
 import Menu from '@/components/Menu';
+import { useGuest } from '@/contexts/GuestContext';
 import React, { useState } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import IglesiaScreen from './pages/iglesia';
 import InicioScreen from './pages/inicio';
 import RecepcionScreen from './pages/recepcion';
@@ -10,16 +11,30 @@ import VestimentaScreen from './pages/vestimenta';
 
 export default function TabLayout() {
   const [currentPage, setCurrentPage] = useState('inicio');
-  const [rsvpActive, setRsvpActive] = useState(true); // Set to false if you want to disable RSVP initially
-  const [invitado1, setInvitado1] = useState(''); // Set guest names here or from URL params
-  const [invitado2, setInvitado2] = useState('');
+  const { guestData, isLoading, error } = useGuest();
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
 
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#0a7ea4" />
+        <Text style={styles.loadingText}>Cargando datos del invitado...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
   const renderPage = () => {
     switch (currentPage) {
       case 'inicio':
-        return <InicioScreen invitado1={invitado1} invitado2={invitado2} />;
+        return <InicioScreen invitado1={guestData.invitado1} invitado2={guestData.invitado2} />;
       case 'iglesia':
         return <IglesiaScreen />;
       case 'recepcion':
@@ -31,7 +46,7 @@ export default function TabLayout() {
       case 'rsvp':
         return <RsvpScreen />;
       default:
-        return <InicioScreen invitado1={invitado1} invitado2={invitado2} />;
+        return <InicioScreen invitado1={guestData.invitado1} invitado2={guestData.invitado2} />;
     }
   };
 
@@ -40,7 +55,7 @@ export default function TabLayout() {
       <Menu 
         currentPage={currentPage} 
         onPageChange={setCurrentPage} 
-        rsvpActive={rsvpActive}
+        rsvpActive={guestData.rsvpActive}
       />
       <View style={[styles.content, isLandscape && styles.landscapeContent]}>
         {renderPage()}
@@ -58,5 +73,20 @@ const styles = StyleSheet.create({
   },
   landscapeContent: {
     marginTop: 60, // Height of the menu in landscape
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#ff0000',
+    textAlign: 'center',
+    padding: 20,
   },
 });
