@@ -1,7 +1,7 @@
 import Menu from '@/components/Menu';
 import { useGuest } from '@/contexts/GuestContext';
-import React, { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Animated, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import CeremoniaScreen from './pages/ceremonia';
 import InformacionScreen from './pages/informacion';
 import InicioScreen from './pages/inicio';
@@ -12,11 +12,22 @@ import VestimentaScreen from './pages/vestimenta';
 
 export default function TabLayout() {
   const [currentPage, setCurrentPage] = useState('inicio');
+  const fadeAnim = useRef(new Animated.Value(1)).current;
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
   const menuHeight = isLandscape ? height * 0.13 : 0;
   const { guestData, isLoading, error } = useGuest();
   const { updateGuestStatus } = useGuest();
+
+  useEffect(() => {
+    // Fade to slightly transparent, then fade in when page changes
+    fadeAnim.setValue(0.3);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1,
+      useNativeDriver: true,
+    }).start();
+  }, [currentPage]);
   if (guestData.name_1 !== "" && guestData.invitation_status === ""){
     updateGuestStatus("abierta");
   }
@@ -64,9 +75,9 @@ export default function TabLayout() {
         onPageChange={setCurrentPage} 
         rsvpActive={guestData.rsvpActive}
       />
-      <View style={[styles.content, isLandscape && { marginTop: menuHeight }]}>
+      <Animated.View style={[styles.content, isLandscape && { marginTop: menuHeight }, { opacity: fadeAnim }]}>
         {renderPage()}
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -74,9 +85,11 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   centerContent: {
     justifyContent: 'center',
