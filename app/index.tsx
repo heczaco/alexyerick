@@ -6,7 +6,7 @@ import SaveTheDateScreen from "./(tabs)/savethedate";
 export default function HomeScreen() {
   const pageType = process.env.EXPO_INDEX_PAGE || 'savethedate';
   const params = useLocalSearchParams();
-  console.log(process.env.EXPO_INDEX_PAGE);
+  console.log("environment variable EXPO_INDEX_PAGE:", process.env.EXPO_INDEX_PAGE);
   if (pageType === 'invitacion') {
     return <InvitacionScreen />;
   }

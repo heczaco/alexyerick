@@ -24,7 +24,7 @@ export default function TabLayout() {
     fadeAnim.setValue(0.3);
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 1,
+      duration: 600,
       useNativeDriver: true,
     }).start();
   }, [currentPage]);
