@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
-import React from 'react';
-import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 interface MenuProps {
   currentPage: string;
@@ -14,11 +14,24 @@ interface MenuButtonProps {
   currentPage: string;
   onPress: (id: string) => void;
   children: string;
+  textVisible: boolean;
+  onHover: () => void;
 }
 
-function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonProps) {
+function MenuButton({ id, active, currentPage, onPress, children, textVisible, onHover }: MenuButtonProps) {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  
+  useEffect(() => {
+    if (!isLandscape) {
+      Animated.timing(slideAnim, {
+        toValue: textVisible ? 0 : 100,
+        duration: 700,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [textVisible, isLandscape]);
   
   let buttonStyle = styles.menuButton;
   let circleStyle = styles.circle1;
@@ -38,6 +51,20 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
   const activeCircleStyle = isActive ? styles.activeCircle : null;
   const isFirstButton = id === 'inicio';
   
+  const handlePress = () => {
+    if (!isLandscape && !textVisible) {
+      // If text is hidden, only show it, don't navigate
+      onHover();
+    } else {
+      // If text is visible or in landscape, navigate
+      onPress(id);
+      // Reset timer on navigation in portrait mode
+      if (!isLandscape) {
+        onHover();
+      }
+    }
+  };
+  
   return (
     <Pressable
       style={[
@@ -47,7 +74,7 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
         isLandscape && isFirstButton && styles.leftButMenu,
         !isLandscape && styles.portraitButton
       ]}
-      onPress={() => onPress(id)}
+      onPress={handlePress}
       disabled={!active}
     >
       {isLandscape ? (
@@ -56,9 +83,21 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
         </Text>
       ) : (
         <>
-          <Text style={[styles.buttonTextPortrait, isActive && styles.activeButtonText]}>
+          <Animated.Text 
+            style={[
+              styles.buttonTextPortrait, 
+              isActive && styles.activeButtonText,
+              { 
+                transform: [{ translateX: slideAnim }],
+                opacity: slideAnim.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: [1, 0],
+                })
+              }
+            ]}
+          >
             {children}
-          </Text>
+          </Animated.Text>
           <View style={[circleStyle, activeCircleStyle, styles.portraitCircle]} />
         </>
       )}
@@ -69,6 +108,41 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
 export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProps) {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
+  const [textVisible, setTextVisible] = useState(true);
+  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startHideTimer = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+    }
+    hideTimerRef.current = setTimeout(() => {
+      if (!isLandscape) {
+        setTextVisible(false);
+      }
+    }, 5000);
+  };
+
+  const showText = () => {
+    setTextVisible(true);
+    startHideTimer();
+  };
+
+  useEffect(() => {
+    if (!isLandscape) {
+      startHideTimer();
+    } else {
+      setTextVisible(true);
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+    }
+
+    return () => {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+    };
+  }, [isLandscape]);
 
   
   
@@ -87,25 +161,25 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
         </View>
       )}
       <View style={isLandscape ? styles.buttonsContainer : null}>
-        <MenuButton id="inicio" active={true} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="inicio" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           INICIO
         </MenuButton>
-        <MenuButton id="ceremonia" active={true} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="ceremonia" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           CEREMONIA
         </MenuButton>
-        <MenuButton id="recepcion" active={true} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="recepcion" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           RECEPCIÓN
         </MenuButton>
-        <MenuButton id="vestimenta" active={true} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="vestimenta" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           VESTIMENTA
         </MenuButton>
-        <MenuButton id="informacion" active={true} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="informacion" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           INFORMACION
         </MenuButton>
-        <MenuButton id="regalos" active={true} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="regalos" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           REGALOS
         </MenuButton>
-        <MenuButton id="rsvp" active={rsvpActive} currentPage={currentPage} onPress={onPageChange}>
+        <MenuButton id="rsvp" active={rsvpActive} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           R.S.V.P
         </MenuButton>
       </View>
