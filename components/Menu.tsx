@@ -20,27 +20,16 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
   
-  let buttonStyle = styles.menuButton1;
+  let buttonStyle = styles.menuButton;
   let circleStyle = styles.circle1;
   
   switch (currentPage) {
     case 'inicio':
-      buttonStyle = styles.menuButton1;
-      circleStyle = styles.circle1;
-      break;
     case 'regalos':
     case 'rsvp':
-    case 'iglesia':
-      buttonStyle = styles.menuButton2;
-      circleStyle = styles.circle2;
-      break;
+    case 'ceremonia':
     case 'recepcion':
-      buttonStyle = styles.menuButton3;
-      circleStyle = styles.circle3;
-      break;
     case 'vestimenta':
-      buttonStyle = styles.menuButton4;
-      circleStyle = styles.circle2;
       break;
   }
   
@@ -67,7 +56,7 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
         </Text>
       ) : (
         <>
-          <Text style={[styles.buttonText, !isActive && styles.transparentText]}>
+          <Text style={[styles.buttonTextPortrait, isActive && styles.activeButtonText]}>
             {children}
           </Text>
           <View style={[circleStyle, activeCircleStyle, styles.portraitCircle]} />
@@ -80,19 +69,13 @@ function MenuButton({ id, active, currentPage, onPress, children }: MenuButtonPr
 export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProps) {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
+
   
-  let menuBackgroundStyle = styles.menuWhite;
-  if (currentPage === 'recepcion') {
-    menuBackgroundStyle = styles.menuTransparent;
-  } else if (currentPage === 'vestimenta') {
-    menuBackgroundStyle = styles.menuDark;
-  }
   
   return (
     <View style={[
       styles.divMenu,
       isLandscape ? styles.landscapeMenu : styles.portraitMenu,
-      isLandscape && menuBackgroundStyle
     ]}>
       {isLandscape && (
         <View style={styles.logoMenu}>
@@ -103,24 +86,29 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
           />
         </View>
       )}
-      <MenuButton id="inicio" active={true} currentPage={currentPage} onPress={onPageChange}>
-        INICIO
-      </MenuButton>
-      <MenuButton id="iglesia" active={true} currentPage={currentPage} onPress={onPageChange}>
-        CEREMONIA
-      </MenuButton>
-      <MenuButton id="recepcion" active={true} currentPage={currentPage} onPress={onPageChange}>
-        RECEPCIÓN
-      </MenuButton>
-      <MenuButton id="vestimenta" active={true} currentPage={currentPage} onPress={onPageChange}>
-        VESTIMENTA
-      </MenuButton>
-      <MenuButton id="regalos" active={true} currentPage={currentPage} onPress={onPageChange}>
-        MESA DE REGALOS
-      </MenuButton>
-      <MenuButton id="rsvp" active={rsvpActive} currentPage={currentPage} onPress={onPageChange}>
-        R.S.V.P
-      </MenuButton>
+      <View style={isLandscape ? styles.buttonsContainer : null}>
+        <MenuButton id="inicio" active={true} currentPage={currentPage} onPress={onPageChange}>
+          INICIO
+        </MenuButton>
+        <MenuButton id="ceremonia" active={true} currentPage={currentPage} onPress={onPageChange}>
+          CEREMONIA
+        </MenuButton>
+        <MenuButton id="recepcion" active={true} currentPage={currentPage} onPress={onPageChange}>
+          RECEPCIÓN
+        </MenuButton>
+        <MenuButton id="vestimenta" active={true} currentPage={currentPage} onPress={onPageChange}>
+          VESTIMENTA
+        </MenuButton>
+        <MenuButton id="informacion" active={true} currentPage={currentPage} onPress={onPageChange}>
+          INFORMACION
+        </MenuButton>
+        <MenuButton id="regalos" active={true} currentPage={currentPage} onPress={onPageChange}>
+          REGALOS
+        </MenuButton>
+        <MenuButton id="rsvp" active={rsvpActive} currentPage={currentPage} onPress={onPageChange}>
+          R.S.V.P
+        </MenuButton>
+      </View>
     </View>
   );
 }
@@ -130,71 +118,38 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 15,
   },
-  portraitMenu: {
-    flexDirection: 'column',
-    right: 0,
-    top: '50%',
-    transform: [{ translateY: -150 }],
-    marginRight: -5,
-  },
   landscapeMenu: {
     flexDirection: 'row',
     top: 0,
     left: 0,
     right: 0,
     width: '100%',
-    height: 60,
+    height: '13%',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  menuWhite: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-  },
-  menuTransparent: {
-    backgroundColor: 'transparent',
-  },
-  menuDark: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 1)',
   },
   logoMenu: {
     position: 'absolute',
-    left: 40,
-    height: 40,
+    left: '2%',
+    height: '60%',
     width: 120,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    width: '80%',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
   },
   logoImage: {
     width: '100%',
     height: '100%',
   },
-  logoText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#A16F3C',
-  },
-  menuButton1: {
+  menuButton: {
     backgroundColor: 'transparent',
     borderWidth: 0,
-  },
-  menuButton2: {
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-  },
-  menuButton3: {
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-  },
-  menuButton4: {
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-  },
-  portraitButton: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    margin: 10,
-    paddingRight: 5,
   },
   landscapeButton: {
     justifyContent: 'center',
@@ -203,6 +158,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 8,
     height: '60%',
+    flex: 1,
     borderLeftWidth: 1,
     borderLeftColor: '#2C2C2C',
   },
@@ -210,46 +166,58 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
   },
   buttonText: {
-    fontSize: 11,
-    color: '#666666',
+    fontSize: 14,
+    color: '#2C2C2C',
     fontFamily: 'Raleway_400Regular',
-  },
-  transparentText: {
-    color: 'transparent',
+    textAlign: 'center',
   },
   activeButton: {},
   activeButtonText: {
     fontFamily: 'Raleway_700Bold',
-    color: '#2C2C2C',
+  },
+  
+  // Portrait menu background styles (if needed in the future)
+  portraitMenu: {
+    flexDirection: 'column',
+    right: '7%',
+    top: '74%',
+    transform: [{ translateY: -150 }],
+    marginRight: -5,
+    width: '40%',
+  },
+  portraitButton: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginVertical: 8,
+    paddingRight: 0,
+    width: '100%',
+  },
+  buttonTextPortrait: {
+    fontSize: 13,
+    color: '#FFFFFF',
+    fontFamily: 'Raleway_400Regular',
+    textAlign: 'left',
+    width: "60%",
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   circle1: {
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
     width: 10,
     height: 10,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: '#FFFFFF',
     backgroundColor: 'transparent',
-  },
-  circle2: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#D3C3B3',
-    backgroundColor: 'transparent',
-  },
-  circle3: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#303030',
-    backgroundColor: 'transparent',
-  },
-  portraitCircle: {
-    marginLeft: 10,
   },
   activeCircle: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
   },
+  portraitCircle: {
+    marginLeft: 12,
+  },
+  
 });

@@ -2,7 +2,8 @@ import Menu from '@/components/Menu';
 import { useGuest } from '@/contexts/GuestContext';
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import IglesiaScreen from './pages/iglesia';
+import CeremoniaScreen from './pages/ceremonia';
+import InformacionScreen from './pages/informacion';
 import InicioScreen from './pages/inicio';
 import RecepcionScreen from './pages/recepcion';
 import RegalosScreen from './pages/regalos';
@@ -35,12 +36,14 @@ export default function TabLayout() {
     switch (currentPage) {
       case 'inicio':
         return <InicioScreen invitado1={guestData.invitado1} invitado2={guestData.invitado2} />;
-      case 'iglesia':
-        return <IglesiaScreen />;
+      case 'ceremonia':
+        return <CeremoniaScreen />;
       case 'recepcion':
         return <RecepcionScreen />;
       case 'vestimenta':
         return <VestimentaScreen />;
+      case 'informacion':
+        return <InformacionScreen />;
       case 'regalos':
         return <RegalosScreen />;
       case 'rsvp':

@@ -60,6 +60,7 @@ export function GuestProvider({ children }: { children: ReactNode }) {
 
         const data = await response.json();
         data.rsvpActive = data.name_1 !== "" && data.name_1 !== null;
+        console.log(data);
         setGuestDataState({
           ...defaultGuestData,
           ...data,
