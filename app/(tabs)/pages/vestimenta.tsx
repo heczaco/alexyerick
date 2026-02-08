@@ -14,7 +14,7 @@ export default function VestimentaScreen() {
       }
       style={styles.container}
       resizeMode="cover"
-      imageStyle={styles.backgroundImage}
+      imageStyle={isLandscape ? styles.backgroundImageLandscape : styles.backgroundImage}
     >
       <View style={[styles.content, isLandscape && styles.contentLandscape]}>
    
@@ -44,12 +44,20 @@ export default function VestimentaScreen() {
 const styles = StyleSheet.create({
   container: {
     flex:1,
+    alignSelf: 'stretch',
     backgroundColor: '#4A3F35',
     
   },
   backgroundImage: {
     width: '100%',
     height: '100%',
+  },
+  backgroundImageLandscape: {
+    width: '100%',
+    height: '100%',
+    alignSelf: 'flex-start',
+    resizeMode: 'cover',
+    transform: [{ translateY:0 }],
   },
   
   content: {

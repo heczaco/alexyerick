@@ -1,3 +1,4 @@
+import { useGuest } from '@/contexts/GuestContext';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
@@ -5,7 +6,11 @@ import { Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, 
 export default function CeremoniaScreen() {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
-
+  const { guestData } = useGuest();
+  const { updateGuestStatus } = useGuest();
+  if (guestData.name_1 !== "" && guestData.invitation_status === "abierta"){
+    updateGuestStatus("leida");
+  }
   const openMap = () => {
     // Replace with your actual church location
     Linking.openURL('https://maps.app.goo.gl/yUeSfkSRvZsPqRaE6');

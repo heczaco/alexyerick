@@ -11,7 +11,7 @@ export default function RsvpScreen() {
   const params = useGlobalSearchParams();
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmedModalVisible, setConfirmedModalVisible] = useState(false);
-  const [selectedAttendees, setSelectedAttendees] = useState(0);
+  const [selectedAttendees, setSelectedAttendees] = useState(parseInt(guestData.available_invitations) || 0);
   const { width, height } = useWindowDimensions();
     const isLandscape = width > height;
   
@@ -119,6 +119,8 @@ export default function RsvpScreen() {
                 selectedValue={selectedAttendees}
                 onValueChange={(value) => setSelectedAttendees(value)}
                 style={styles.picker}
+                dropdownIconColor="transparent"
+                mode="dropdown"
               >
                 {Array.from({ length: parseInt(guestData.available_invitations)+1}, (_, i) => (
                   <Picker.Item key={i} label={i.toString()} value={i} />
@@ -338,16 +340,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
     alignContent: 'center',
-    borderWidth: 0,
     borderColor: 'transparent',
-    borderRadius: 10,
     marginBottom: 20,
     overflow: 'hidden',
+    backgroundColor: 'transparent',
   },
   picker: {
     width: '100%',
     textAlign: 'center',
     height: 50,
+    fontFamily: 'Raleway_600SemiBold',
+    fontSize: 19,
+    borderWidth: 0,
+    borderColor: 'transparent',
+    backgroundColor: 'transparent',
   },
   confirmButton: {
     backgroundColor: '#4A4C34',

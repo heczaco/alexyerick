@@ -12,10 +12,14 @@ import VestimentaScreen from './pages/vestimenta';
 
 export default function TabLayout() {
   const [currentPage, setCurrentPage] = useState('inicio');
-  const { guestData, isLoading, error } = useGuest();
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
-
+  const menuHeight = isLandscape ? height * 0.13 : 0;
+  const { guestData, isLoading, error } = useGuest();
+  const { updateGuestStatus } = useGuest();
+  if (guestData.name_1 !== "" && guestData.invitation_status === ""){
+    updateGuestStatus("abierta");
+  }
   if (isLoading) {
     return (
       <View style={[styles.container, styles.centerContent]}>
@@ -60,7 +64,7 @@ export default function TabLayout() {
         onPageChange={setCurrentPage} 
         rsvpActive={guestData.rsvpActive}
       />
-      <View style={[styles.content, isLandscape && styles.landscapeContent]}>
+      <View style={[styles.content, isLandscape && { marginTop: menuHeight }]}>
         {renderPage()}
       </View>
     </View>
@@ -73,9 +77,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-  },
-  landscapeContent: {
-    marginTop: 60, // Height of the menu in landscape
   },
   centerContent: {
     justifyContent: 'center',

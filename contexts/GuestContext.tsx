@@ -9,6 +9,7 @@ interface GuestData {
   nickname_2: string;
   available_invitations: number;
   confirmation_field: string | null;
+  invitation_status: string;
   rsvpActive: boolean;
   [key: string]: any; // Allow other properties from API
 }
@@ -16,6 +17,7 @@ interface GuestData {
 interface GuestContextType {
   guestData: GuestData;
   setGuestData: (data: Partial<GuestData>) => void;
+  updateGuestStatus: (status: string) => void;
   isLoading: boolean;
   error: string | null;
 }
@@ -27,6 +29,7 @@ const defaultGuestData: GuestData = {
     nickname_2: '',
     available_invitations: 0,
     confirmation_field: null,
+    invitation_status: '',
     rsvpActive: false,
 };
 
@@ -80,8 +83,38 @@ export function GuestProvider({ children }: { children: ReactNode }) {
     setGuestDataState(prev => ({ ...prev, ...data }));
   };
 
+  const updateGuestStatus = (status: string) => {
+    const id = params.id as string;
+    
+    if (!id) {
+      return;
+    }
+
+    // Fire and forget - don't block the app
+    fetch(`https://googlesheets-invitations-api.onrender.com/guests/status/${Config.INVITATION_ID}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uuid: id,
+        status: status,
+      }),
+    })
+      .then(response => {
+        if (response.ok) {
+          // Update local state on successful 200 response
+          setGuestDataState(prev => ({ ...prev, status: status }));
+        }
+        return response;
+      })
+      .catch(err => {
+        console.error('Error updating guest status:', err);
+      });
+  };
+
   return (
-    <GuestContext.Provider value={{ guestData, setGuestData, isLoading, error }}>
+    <GuestContext.Provider value={{ guestData, setGuestData, updateGuestStatus, isLoading, error }}>
       {children}
     </GuestContext.Provider>
   );
