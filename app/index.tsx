@@ -4,10 +4,9 @@ import InvitacionScreen from "./(tabs)/invitacion";
 import SaveTheDateScreen from "./(tabs)/savethedate";
 
 export default function HomeScreen() {
-  const pageType = process.env.EXPO_INDEX_PAGE || 'savethedate';
-  console.log(process.env);
+  const pageType = process.env.EXPO_PUBLIC_PAGE_TYPE || 'savethedate';
   const params = useLocalSearchParams();
-  console.log("environment variable EXPO_INDEX_PAGE:", process.env.EXPO_INDEX_PAGE);
+  console.log("environment variable EXPO_INDEX_PAGE:", process.env.EXPO_PUBLIC_PAGE_TYPE);
   if (pageType === 'invitacion') {
     return <InvitacionScreen />;
   }
