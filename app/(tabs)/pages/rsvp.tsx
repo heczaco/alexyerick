@@ -270,6 +270,8 @@ const styles = StyleSheet.create({
     marginTop: "0%",
   },
   portraitNames: {
+    alignItems: 'center',
+    textAlign: 'center',
     fontSize: 24,
     letterSpacing: 4,
   },
