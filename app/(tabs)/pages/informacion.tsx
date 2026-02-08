@@ -1,3 +1,4 @@
+import { useGuest } from '@/contexts/GuestContext';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
@@ -5,10 +6,11 @@ import { Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, 
 export default function InformacionScreen() {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
-
-  const openInstagram = () => {
-    Linking.openURL('https://www.instagram.com/alexyerick/');
-  };
+  const { guestData } = useGuest();
+  const { updateGuestStatus } = useGuest();
+  if (guestData.name_1 !== "" && guestData.invitation_status === "abierta"){
+    updateGuestStatus("leida");
+  }
 
   return (
     <View style={styles.container}>
