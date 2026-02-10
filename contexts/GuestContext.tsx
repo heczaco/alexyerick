@@ -39,6 +39,7 @@ export function GuestProvider({ children }: { children: ReactNode }) {
   const [guestData, setGuestDataState] = useState<GuestData>(defaultGuestData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const params = useGlobalSearchParams();
 
   useEffect(() => {
@@ -89,7 +90,16 @@ export function GuestProvider({ children }: { children: ReactNode }) {
     if (!id) {
       return;
     }
-
+    if ((guestData.invitation_status === status)  ||
+        (guestData.invitation_status === "Confirmada por eVite") ||
+        (guestData.name_1 === "") ||
+        isUpdatingStatus) // Prevent multiple simultaneous requests
+    {
+      return;
+    }
+    
+    setIsUpdatingStatus(true);
+    
     // Fire and forget - don't block the app
     fetch(`https://googlesheets-invitations-api.onrender.com/guests/status/${Config.INVITATION_ID}`, {
       method: 'POST',
@@ -104,12 +114,15 @@ export function GuestProvider({ children }: { children: ReactNode }) {
       .then(response => {
         if (response.ok) {
           // Update local state on successful 200 response
-          setGuestDataState(prev => ({ ...prev, status: status }));
+          setGuestDataState(prev => ({ ...prev, invitation_status: status }));
         }
         return response;
       })
       .catch(err => {
         console.error('Error updating guest status:', err);
+      })
+      .finally(() => {
+        setIsUpdatingStatus(false);
       });
   };
 

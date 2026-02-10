@@ -4,7 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { Image } from 'expo-image';
 import { useGlobalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import { ImageBackground, Linking, Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, ImageBackground, Linking, Modal, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 export default function RsvpScreen() {
   const { guestData, setGuestData } = useGuest();
@@ -12,8 +12,29 @@ export default function RsvpScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [confirmedModalVisible, setConfirmedModalVisible] = useState(false);
   const [selectedAttendees, setSelectedAttendees] = useState(parseInt(guestData.available_invitations) || 0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { width, height } = useWindowDimensions();
     const isLandscape = width > height;
+  
+  // Helper function to determine which names to display
+  const getDisplayNames = () => {
+    const isCompleteName = (name: string) => name && name.trim().includes(' ');
+    if (guestData.nickname_1 === "" || guestData.nickname_2 === "" ) {
+      return { name1: guestData.name_1, name2: guestData.name_2 };
+    }
+    else if (guestData.name_2 && isCompleteName(guestData.name_1) && isCompleteName(guestData.name_2)) {
+      // Both names are complete (have first and last name)
+      return { name1: guestData.name_1, name2: guestData.name_2 };
+    } else if (guestData.name_2 && (!isCompleteName(guestData.name_1) || !isCompleteName(guestData.name_2))) {
+      // Either name is incomplete, use nicknames
+      return { name1: guestData.nickname_1, name2: guestData.nickname_2 };
+    } else {
+      // Only name_1 is available
+      return { name1: guestData.name_1, name2: null };
+    }
+  };
+
+  const displayNames = getDisplayNames();
   
   const openRSVP = () => {
     if (!guestData.confirmation_field || guestData.confirmation_field === '') {
@@ -24,6 +45,9 @@ export default function RsvpScreen() {
   };
 
   const handleConfirm = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
+    setIsSubmitting(true);
     try {
       const id = params.id as string;
       const url = `https://googlesheets-invitations-api.onrender.com/guests/${Config.INVITATION_ID}`;
@@ -50,12 +74,15 @@ export default function RsvpScreen() {
     } catch (err) {
       console.error('Error confirming attendance:', err);
       alert('Error al enviar la confirmación. Inténtalo de nuevo.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const openWhatsApp = () => {
-    const phoneNumber = '+525555555555'; // Replace with wedding planner's number
-    const message = 'Hola';
+    const phoneNumber = '+4447654000'; // Replace with wedding planner's number
+    const waveEmoji = String.fromCodePoint(0x1F44B);
+    const message = `Hola tengo problemas con mi confirmación de la boda de Alex y Erick ${waveEmoji}`;
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
   };
@@ -109,8 +136,8 @@ export default function RsvpScreen() {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Nos encantaría que nos acompañaras a nuestra boda:</Text>
             
-            <Text style={styles.guestName}>{guestData.name_1}</Text>
-            {guestData.name_2 && <Text style={styles.guestName}>{guestData.name_2}</Text>}
+            <Text style={styles.guestName}>{displayNames.name1}</Text>
+            {displayNames.name2 && <Text style={styles.guestName}>{displayNames.name2}</Text>}
             
             <Text style={styles.modalLabel}>Confirmar número de asistentes</Text>
             
@@ -128,11 +155,19 @@ export default function RsvpScreen() {
               </Picker>
             </View>
             
-            <Pressable style={styles.confirmButton} onPress={handleConfirm}>
-              <Text style={styles.confirmButtonText}>Confirmar</Text>
+            <Pressable 
+              style={[styles.confirmButton, isSubmitting && styles.confirmButtonDisabled]} 
+              onPress={handleConfirm}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.confirmButtonText}>Confirmar</Text>
+              )}
             </Pressable>
             
-            <Pressable style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+            <Pressable style={styles.cancelButton} onPress={() => setModalVisible(false)} disabled={isSubmitting}>
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </Pressable>
           </View>
@@ -148,8 +183,8 @@ export default function RsvpScreen() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.guestName}>{guestData.name_1}</Text>
-            {guestData.name_2 && <Text style={styles.guestName}>{guestData.name_2}</Text>}
+            <Text style={styles.guestName}>{displayNames.name1}</Text>
+            {displayNames.name2 && <Text style={styles.guestName}>{displayNames.name2}</Text>}
             
             <Text style={styles.confirmedText}>
               {guestData.confirmation_field} asistentes confirmados
@@ -364,6 +399,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginTop: 10,
     width: '100%',
+  },
+  confirmButtonDisabled: {
+    backgroundColor: '#9A9C84',
+    opacity: 0.6,
   },
   confirmButtonText: {
     fontFamily: 'Raleway_600SemiBold',
