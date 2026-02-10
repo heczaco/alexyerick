@@ -9,7 +9,7 @@ export default function HomeScreen() {
       <iframe 
         height="75%" 
         src="https://www.youtube.com/embed/velNa1Or318?autoplay=1&mute=1&loop=1&playlist=velNa1Or318&controls=1&modestbranding=1&rel=0" 
-        title="Save the Date Alex & Erick"
+        title="Acompañanos a escribir este nuevo capítulo."
         allow="autoplay; encrypted-media; web-share"
         allowFullScreen
         frameBorder="0"
