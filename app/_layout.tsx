@@ -59,8 +59,8 @@ export default function RootLayout() {
     <GuestProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <meta property="og:title" content="Alex y Erick ♡ 30 de Mayo del 2026" />
-      <meta property="og:description" content="Save the date! 30 - 5 - 2026" />
-      <meta property="og:image" content="https://alexyerick.onrender.com/saveTheDate_mini.png" />
+      <meta property="og:description" content="Acompáñanos a escribir este capítulo" />
+      <meta property="og:image" content="https://alexyerick.onrender.com/previewWhats.png" />
       <meta property="og:url" content="https://alexyerick.com" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
