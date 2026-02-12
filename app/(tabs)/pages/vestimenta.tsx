@@ -1,9 +1,22 @@
-import React from 'react';
-import { ImageBackground, Linking, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image } from 'expo-image';
+import React, { useRef } from 'react';
+import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 export default function VestimentaScreen() {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
+  const scrollViewRef = useRef<ScrollView>(null);
+  const imageContainerRef = useRef<View>(null);
+
+  const scrollToImage = () => {
+    imageContainerRef.current?.measureLayout(
+      scrollViewRef.current as any,
+      (x, y) => {
+        scrollViewRef.current?.scrollTo({ y, animated: true });
+      },
+      () => {}
+    );
+  };
 
   return (
     <ImageBackground
@@ -16,32 +29,42 @@ export default function VestimentaScreen() {
       resizeMode="cover"
       imageStyle={isLandscape ? styles.backgroundImageLandscape : styles.backgroundImage}
     >
+      <ScrollView ref={scrollViewRef} style={styles.scrollView} contentContainerStyle={styles.content}>
       <View style={[styles.content, isLandscape && styles.contentLandscape]}>
-   
-        {/* Text Content Container */}
-        <View style={[styles.textContainer, isLandscape && styles.textContainerLandscape]}>
+          {/* Text Content Container */}
+          <View style={[styles.textContainer, isLandscape && styles.textContainerLandscape]}>
 
-          {/* Title */}
-          <Text style={[styles.title, isLandscape && styles.titleLandscape]}>
-            DRESSCODE
-          </Text>
+            {/* Title */}
+            <Text style={[styles.title, isLandscape && styles.titleLandscape]}>
+              DRESSCODE
+            </Text>
 
-          {/* Dress Code Type */}
-          <Text style={[styles.dressCode, isLandscape && styles.dressCodeLandscape]}>
-            FORMAL
-          </Text>
-          {/* Inspiration Button */}
-          {/* Map Button */}
-            <Pressable style={[styles.button, isLandscape && styles.buttonLandscape]} onPress={() => Linking.openURL('https://pin.it/67Xl1fZHS')}>
-                      <Text style={[styles.buttonText, isLandscape && styles.buttonTextLandscape]}>INSPIRACIÓN</Text>
-          </Pressable>
-        </View>
+            {/* Dress Code Type */}
+            <Text style={[styles.dressCode, isLandscape && styles.dressCodeLandscape]}>
+              FORMAL
+            </Text>
+            {/* Inspiration Button */}
+            {/* Map Button */}
+              <Pressable style={[styles.button, isLandscape && styles.buttonLandscape]} onPress={scrollToImage}>
+                        <Text style={[styles.buttonText, isLandscape && styles.buttonTextLandscape]}>INSPIRACIÓN</Text>
+            </Pressable>
+            {/* Hotels */}
+          </View>
       </View>
+      <View ref={imageContainerRef} style={[styles.pinterestContainer, !isLandscape && styles.pinterestContainerPortrait]}>
+        <Image
+          source={require('@/assets/images/vestimenta/dresscode.png')}
+          style={styles.imagePinterest}
+          contentFit="contain"
+        />
+      </View>
+      </ScrollView>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+
   container: {
     flex:1,
     alignSelf: 'stretch',
@@ -59,7 +82,32 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     transform: [{ translateY:0 }],
   },
-  
+  ///// Scroll View
+  scrollView: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    paddingBottom: 50,
+  },
+  pinterestContainer: {
+    flexDirection: 'row',
+    top: '100%',
+    justifyContent: 'center',
+    marginTop: 20,
+    width: '50%',
+    paddingBottom: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    marginBottom: 50,
+  },
+  pinterestContainerPortrait: {
+    width: '90%',
+  },
+  imagePinterest: {
+    top: 50,
+    width: '90%',
+    aspectRatio: .136,
+  },
   content: {
     flex: 1,
     alignItems: 'center',
