@@ -258,6 +258,7 @@ const styles = StyleSheet.create({
     transform: [{ translateY: -150 }],
     marginRight: -5,
     width: '40%',
+    minWidth: 200,
   },
   portraitButton: {
     flexDirection: 'row',
