@@ -60,8 +60,8 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <meta property="og:title" content="Alex y Erick ♡ 30 de Mayo del 2026" />
       <meta property="og:description" content="Acompáñanos a escribir este capítulo" />
-      <meta property="og:image" content="https://alexyerick.onrender.com/previewWhats.png" />
-      <meta property="og:url" content="https://alexyerick.com" />
+      <meta property="og:image" content="https://invitacion.onrender.com/previewWhats.png" />
+      <meta property="og:url" content="https://invitacion.com" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="+not-found" />

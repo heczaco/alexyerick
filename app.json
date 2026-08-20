@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "alexyerick-invitacion",
-    "slug": "alexyerick-invitacion",
+    "name": "invitacion-boda",
+    "slug": "invitacion-boda",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "alexyerickinvitacion",
+    "scheme": "invitacioninvitacion",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
