@@ -143,18 +143,38 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
       }
     };
   }, [isLandscape]);
-
-  
+  var currentCustomStyle = null;
+  currentCustomStyle = {backgroundColor: 'transparent'};
+  switch (currentPage) {
+    case 'inicio':
+      currentCustomStyle = {backgroundColor: 'transparent'};
+      break;
+    case 'ceremonia':
+      break;
+    case 'recepcion':
+      break;
+    case 'vestimenta':
+      break;
+    case 'informacion':
+      break;
+    case 'regalos':
+      break;
+    case 'rsvp':
+      break;
+    default:
+      break;
+  }
   
   return (
     <View style={[
       styles.divMenu,
       isLandscape ? styles.landscapeMenu : styles.portraitMenu,
+      currentCustomStyle,
     ]}>
       {isLandscape && (
         <View style={styles.logoMenu}>
           <Image 
-            source={require('@/assets/images/monogram_banner.svg')}
+            source={require('@/assets/images/monogram_white.svg')}
             style={styles.logoImage}
             contentFit="contain"
           />
@@ -214,6 +234,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     width: '80%',
+    height: '100%',
     justifyContent: 'space-evenly',
     alignItems: 'center',
   },
@@ -231,23 +252,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     paddingHorizontal: 18,
     paddingVertical: 8,
-    height: '60%',
+    height: '55%',
     flex: 1,
     borderLeftWidth: 1,
-    borderLeftColor: '#2C2C2C',
+    borderLeftColor: '#ffffff',
   },
   leftButMenu: {
     borderLeftWidth: 0,
   },
   buttonText: {
-    fontSize: 14,
-    color: '#2C2C2C',
-    fontFamily: 'Raleway_400Regular',
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontFamily: 'CormorantGaramond_400Regular',
     textAlign: 'center',
   },
   activeButton: {},
   activeButtonText: {
-    fontFamily: 'Raleway_700Bold',
+    fontFamily: 'CormorantGaramond_700Bold',
   },
   
   // Portrait menu background styles (if needed in the future)
@@ -271,7 +292,7 @@ const styles = StyleSheet.create({
   buttonTextPortrait: {
     fontSize: 13,
     color: '#FFFFFF',
-    fontFamily: 'Raleway_400Regular',
+    fontFamily: 'CormorantGaramond_400Regular',
     textAlign: 'left',
     width: "60%",
     textShadowColor: 'rgba(0, 0, 0, 0.5)',

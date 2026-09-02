@@ -1,5 +1,6 @@
 import { GuestProvider } from '@/contexts/GuestContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { CormorantGaramond_300Light } from '@expo-google-fonts/cormorant-garamond';
 import {
   Raleway_100Thin,
   Raleway_100Thin_Italic,
@@ -30,6 +31,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    CormorantGaramond_300Light,
     Raleway_100Thin,
     Raleway_100Thin_Italic,
     Raleway_200ExtraLight,
@@ -58,10 +60,10 @@ export default function RootLayout() {
   return (
     <GuestProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <meta property="og:title" content="Alex y Erick ♡ 30 de Mayo del 2026" />
+      <meta property="og:title" content="Gisela e Israel ♡ 07 de Mayo del 2027" />
       <meta property="og:description" content="Acompáñanos a escribir este capítulo" />
-      <meta property="og:image" content="https://invitacion.onrender.com/previewWhats.png" />
-      <meta property="og:url" content="https://invitacion.com" />
+      <meta property="og:image" content="https://gisela-e-israel.onrender.com/previewWhats.png" />
+      <meta property="og:url" content="https://GiselaeIsrael.com" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="+not-found" />

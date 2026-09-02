@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ImageBackground, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 interface InicioScreenProps {
@@ -7,14 +7,51 @@ interface InicioScreenProps {
   invitado2?: string;
 }
 
+interface WeddingCountdownProps {
+  isLandscape: boolean;
+}
+
+function WeddingCountdown({ isLandscape }: WeddingCountdownProps) {
+  const weddingDate = new Date('2027-05-07T18:00:00');
+  const getTimeUntilWedding = () => Math.max(0, Math.floor((weddingDate.getTime() - Date.now()) / 1000));
+  const [timeUntilWedding, setTimeUntilWedding] = useState(getTimeUntilWedding);
+
+  useEffect(() => {
+    const interval = setInterval(() => setTimeUntilWedding(getTimeUntilWedding()), 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const countdownUnits = [
+    { value: Math.floor(timeUntilWedding / 86400), label: 'DÍAS' },
+    { value: Math.floor((timeUntilWedding % 86400) / 3600), label: 'HORAS' },
+    { value: Math.floor((timeUntilWedding % 3600) / 60), label: 'MINUTOS' },
+    { value: timeUntilWedding % 60, label: 'SEGUNDOS' },
+  ];
+
+  return (
+    <View style={[styles.countdown, isLandscape ? styles.landscapeCountdown : styles.portraitCountdown]}>
+      <View style={styles.countdownUnits}>
+        {countdownUnits.map((unit, index) => (
+          <React.Fragment key={unit.label}>
+            <View style={styles.countdownUnit}>
+              <Text style={[styles.countdownValue, isLandscape ? styles.landscapeCountdownValue : styles.portraitCountdownValue]}>
+                {String(unit.value).padStart(2, '0')}
+              </Text>
+              <Text style={[styles.countdownLabel, isLandscape ? styles.landscapeCountdownLabel : styles.portraitCountdownLabel]}>
+                {unit.label}
+              </Text>
+            </View>
+            {index < countdownUnits.length - 1 && <Text style={styles.countdownSeparator}>:</Text>}
+          </React.Fragment>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export default function InicioScreen({ invitado1 = '', invitado2 = '' }: InicioScreenProps) {
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
-  
-  // Wedding date: May 30, 2026
-  const weddingDate = new Date('2026-05-30T13:00:00');
-  const now = new Date();
-  const timeUntilWedding = Math.max(0, Math.floor((weddingDate.getTime() - now.getTime()) / 1000));
   
   // Format guest names
   let guestNames = invitado1.toUpperCase();
@@ -42,7 +79,7 @@ export default function InicioScreen({ invitado1 = '', invitado2 = '' }: InicioS
         {/* Centered Monogram Logo */}
         <View style={[styles.logoContainer, isLandscape ? styles.landscapeLogo : styles.portraitLogo]}>
           <Image
-            source={require('@/assets/images/monogram_simple.svg')}
+            source={require('@/assets/images/monogram_white.svg')}
             style={styles.logo}
             contentFit="contain"
           />
@@ -51,11 +88,15 @@ export default function InicioScreen({ invitado1 = '', invitado2 = '' }: InicioS
         {/* Names and Date */}
         <View style={isLandscape ? styles.landscapeTextContainer : styles.portraitTextContainer}>
           <Text style={[styles.names, isLandscape ? styles.landscapeNames : styles.portraitNames]}>
-            Erick & Alex
+            GISELA E ISRAEL
           </Text>
           <Text style={[styles.date, isLandscape ? styles.landscapeDate : styles.portraitDate]}>
-            30 MAYO 2026
+            Barra de Navidad, Jal. México
           </Text>
+          <Text style={[styles.date, isLandscape ? styles.landscapeDate : styles.portraitDate]}>
+            07.05.27
+          </Text>
+          <WeddingCountdown isLandscape={isLandscape} />
         </View>
       </View>
     </ImageBackground>
@@ -74,21 +115,48 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   names: {
-    fontFamily: 'Raleway_300Light',
+    fontFamily: 'CormorantGaramond_300Light',
     color: 'white',
     letterSpacing: 8,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   date: {
-    fontFamily: 'Raleway_300Light',
+    fontFamily: 'CormorantGaramond_300Light',
     fontSize: 16,
     color: 'white',
     letterSpacing: 4,
   },
+  countdown: {
+    alignItems: 'center',
+  },
+  countdownUnits: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  countdownUnit: {
+    alignItems: 'center',
+  },
+  countdownValue: {
+    fontFamily: 'CormorantGaramond_300Light',
+    color: 'white',
+    textAlign: 'center',
+  },
+  countdownSeparator: {
+    fontFamily: 'CormorantGaramond_300Light',
+    color: 'white',
+  },
+  countdownLabel: {
+    fontFamily: 'CormorantGaramond_300Light',
+    color: 'white',
+    textAlign: 'center',
+  },
   // Landscape styles
   landscapeBackground: {
     flex: 1,
+    position: 'fixed',
+    top: 0,
+    left: 0,
     width: '100%',
     height: '100%',
   },
@@ -101,6 +169,19 @@ const styles = StyleSheet.create({
   landscapeDate: {
     fontSize: 26,
   },
+  landscapeCountdown: {
+    width: 410,
+    marginTop: 32,
+  },
+  landscapeCountdownValue: {
+    fontSize: 38,
+    width: 88,
+  },
+  landscapeCountdownLabel: {
+    fontSize: 13,
+    letterSpacing: 1,
+    width: 88,
+  },
   landscapeLogo: {
     width: '16%',
     height: '30%',
@@ -112,6 +193,11 @@ const styles = StyleSheet.create({
   },
     landscapeContainer: {
     flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -144,5 +230,18 @@ const styles = StyleSheet.create({
   },
   portraitDate: {
     fontSize: 20,
+  },
+  portraitCountdown: {
+    width: '78%',
+    marginTop: 28,
+  },
+  portraitCountdownValue: {
+    fontSize: 32,
+    width: 68,
+  },
+  portraitCountdownLabel: {
+    fontSize: 10,
+    letterSpacing: 0.5,
+    width: 68,
   },
 });
