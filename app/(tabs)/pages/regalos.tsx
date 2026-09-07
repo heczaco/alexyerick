@@ -1,3 +1,4 @@
+import { generalStyles } from '@/constants/GeneralStyles';
 import * as Clipboard from 'expo-clipboard';
 import { Image } from 'expo-image';
 import React from 'react';
@@ -19,26 +20,18 @@ export default function RegalosScreen() {
             ? require('@/assets/images/regalos/bg_landscape.png')
             : require('@/assets/images/regalos/bg_portrait.png')
         }
-        style={styles.container}
+        style={[styles.container, isLandscape ? generalStyles.landscapeBackground_100: generalStyles.portraitBackground]}
         resizeMode="cover"
-        imageStyle={[styles.backgroundImage, !isLandscape && styles.backgroundImagePortrait]}
       >
-        <View style={[styles.content, isLandscape && styles.contentLandscape]}>
-         
-  
-            {/* Monogram for portrait mode */}
-            {!isLandscape && (
-              <View style={styles.monogramPortrait}>
-                <Image
-                  source={require('@/assets/images/recepcion/rececepcion_monogram.svg')}
-                  style={styles.monogramImagePortrait}
-                  contentFit="contain"
-                  />
-              </View>
-            )}
-  
-            {/* Text Content Container */}
-          <View style={[styles.textContainer, isLandscape && styles.textContainerLandscape]}>
+        <View style={[styles.content, !isLandscape && styles.contentPortrait]}>
+            <View style={styles.monogramPortrait}>
+              <Image
+                source={require('@/assets/images/monogram_white.svg')}
+                style={styles.monogramImagePortrait}
+                contentFit="contain"
+                />
+            </View>
+            
           
             {/* Venue Name */}
             <Text style={[styles.giftMessage, isLandscape && styles.giftMessageLandscape]}>
@@ -61,7 +54,6 @@ export default function RegalosScreen() {
                     />
               </Pressable>
             </View>
-          </View>
         </View>
       </ImageBackground>
     );
@@ -82,10 +74,15 @@ export default function RegalosScreen() {
     },
     content: {
       flex: 1,
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      paddingHorizontal: 40,
-      paddingVertical: 60,
+      position: 'absolute',
+      top: '35%',
+      left: '30%',
+      
+      width: '40%',
+      height: '30%',
+      marginLeft: "5%",
+      backgroundColor: '#252836',
+      opacity: 0.75,
     },
     monogramPortrait: {
       width: "25%",
