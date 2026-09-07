@@ -45,8 +45,8 @@ function MenuButton({ id, active, currentPage, onPress, children, textVisible, o
     case 'regalos':
     case 'rsvp':
     case 'ceremonia':
-    case 'vestimenta':
       break;
+    case 'vestimenta':
     case 'recepcion':
       pageTextStyle = styles.receptionText;
       pageSeparatorStyle = styles.receptionSeparator;
@@ -159,20 +159,17 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
   var currentMonogram = require('@/assets/images/monogram_white.svg');
   switch (currentPage) {
     case 'inicio':
-      break;
     case 'ceremonia':
+    case 'informacion':
+    case 'regalos':
+    case 'rsvp':
+   
       break;
     case 'recepcion':
+    case 'vestimenta':
       currentMonogram = require('@/assets/images/monogram_blue.svg');
       break;
-    case 'vestimenta':
-      break;
-    case 'informacion':
-      break;
-    case 'regalos':
-      break;
-    case 'rsvp':
-      break;
+   
     default:
       break;
   }
