@@ -213,7 +213,7 @@ export default function InformacionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F5F0',
+    backgroundColor: '#F5F2EC',
     alignContent: 'center',
     alignItems: 'center',
     position: 'relative',

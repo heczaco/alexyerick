@@ -1,6 +1,7 @@
+import { generalStyles } from '@/constants/GeneralStyles';
 import { Image } from 'expo-image';
 import React from 'react';
-import { ImageBackground, Linking, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 export default function RecepcionScreen() {
   const { width, height } = useWindowDimensions();
@@ -8,198 +9,144 @@ export default function RecepcionScreen() {
 
   const openMap = () => {
     // Replace with your actual reception venue location
-    Linking.openURL('https://maps.app.goo.gl/yUeSfkSRvZsPqRaE6');
+    Linking.openURL('https://maps.app.goo.gl/bebbv8oZ8KnNFLAa7');
   };
 
   return (
-    <ImageBackground
-      source={
-        isLandscape
-          ? require('@/assets/images/recepcion/recepcion_bg_landscape.png')
-          : require('@/assets/images/recepcion/recepcion_bg_portrait.png')
-      }
-      style={styles.container}
-      resizeMode="cover"
-      imageStyle={[styles.backgroundImage, !isLandscape && styles.backgroundImagePortrait]}
-    >
-      <View style={[styles.content, isLandscape && styles.contentLandscape]}>
-       
+      <View style={[styles.content, !isLandscape && styles.contentPortrait]}>
+        {/* Background */}
+        <View style={[isLandscape ? generalStyles.landscapeBackground_100 : 
+          generalStyles.portraitBackground, styles.bg]}/>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={[styles.content, !isLandscape && styles.content]}
+          showsVerticalScrollIndicator={false}>
 
-          {/* Monogram for portrait mode */}
-          {!isLandscape && (
-            <View style={styles.monogramPortrait}>
-              <Image
-                source={require('@/assets/images/recepcion/rececepcion_monogram.svg')}
-                style={styles.monogramImagePortrait}
-                contentFit="contain"
-                />
-            </View>
-          )}
-
-          {/* Text Content Container */}
-        <View style={[styles.textContainer, isLandscape && styles.textContainerLandscape]}>
-          {/* Time */}
-          <Text style={[styles.time, isLandscape && styles.timeLandscape]}>
-            7:30 P.M.
-          </Text>
-
-          {/* Venue Name */}
-          <Text style={[styles.venueName, isLandscape && styles.venueNameLandscape]}>
-            LA NORIA DEL PALMAR
-          </Text>
-
-          {/* Map Button */}
-          <Pressable style={[styles.button, isLandscape && styles.buttonLandscape]} onPress={openMap}>
-            <Text style={[styles.buttonText, isLandscape && styles.buttonTextLandscape]}>VER MAPA</Text>
-          </Pressable>
-
-          {/* Additional Info */}
-          <Text style={[styles.info, isLandscape && styles.infoLandscape]}>
-            Prol Pedro Vallejo 2557, Gral I. Martinez,{'\n'}
-            78360 San Luis Potosí, S.L.P.
-          </Text>
-
+        {/* Monogram */}
+        <View style={[ styles.monogram, !isLandscape && styles.monogramPortrait]}>
+          <Image
+            source={require('@/assets/images/monogram_blue.svg')}
+            style={styles.imageStd}
+            contentFit="contain"
+            />
         </View>
+          
+        {/* Information */}
+        <View style={isLandscape ? styles.information : styles.informationPortrait}>
+          <Image
+            source={require('@/assets/images/recepcion/informacion.png')}
+            style={styles.imageStd}
+            contentFit="contain"
+            />
+        </View>
+        {/* Map Button */}
+        <Pressable style={[styles.button, !isLandscape && styles.buttonPortrait]} onPress={openMap}>
+          <Text style={[styles.buttonText, !isLandscape && styles.buttonTextPortrait]}>UBICACION</Text>
+        </Pressable>
+
+        {/* Additional Info */}
+        <Text style={[styles.info, !isLandscape && styles.infoPortrait]}>
+          Circuito de los Marinos s/n, Fracc Isla{'\n'}
+          Navidad, 28838 Col.
+        </Text>
+
+        {/* Information */}
+        <View style={isLandscape ? styles.itinerary : styles.itineraryPortrait}>
+          <Image
+            source={require('@/assets/images/recepcion/itinerario.png')}
+            style={styles.imageStd}
+            contentFit="contain"
+            />
+        </View>
+        </ScrollView>
       </View>
-    </ImageBackground>
+      
+    
   );
 }
 
 const styles = StyleSheet.create({
+  bg: {
+    backgroundColor: '#F5F2EC',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F8F5F0',
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-  },
-  backgroundImagePortrait: {
-    height: '130%',
-    transform: [{ translateY: '0%' }],
   },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingHorizontal: 40,
-    paddingVertical: 60,
+    
   },
-  monogramContainer: {
-    position: 'absolute',
-    top: 40,
-    left: 40,
-    width: 60,
-    height: 60,
+  scrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  imageStd: {
+    width: '100%',
+    height: '100%',
   },
   monogram: {
-    width: '100%',
-    height: '100%',
+    marginTop: "4%",
+    width: '16%',
+    height: '18%',
+    marginBottom: "4%",
   },
-  monogramPortrait: {
-    width: "25%",
-    height: "15%",
-    marginTop: "-10%",
-    marginBottom: 10,
+  information: {
+    width: '30%',
+    height: '22%',
+  },
+  info: {
+    fontFamily: 'Raleway_300Light_Italic',
+    fontSize: 11,
+    color: '#3B507D',
+    textAlign: 'center',
     alignSelf: 'center',
+    lineHeight: 22,
+    marginBottom: 15,
   },
-  monogramImagePortrait: {
-    width: '100%',
+  itinerary: {
+    marginTop: "3%",
+    marginLeft: "8%",
+    width: '40%',
     height: '100%',
-  },
-  textContainer: {
-    alignItems: 'center',
-    backgroundColor: '#4A4C3488',
-    padding: 20,
-    borderRadius: 15,
-    width: '100%',
-  },
-  time: {
-    fontFamily: 'Raleway_300Light',
-    fontSize: 13,
-    letterSpacing: 4,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 4,
-    marginTop: 4,
-  },
-  venueName: {
-    fontFamily: 'Raleway_500Medium',
-    fontSize: 14,
-    letterSpacing: 3,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 4,
-    marginTop: 4,
-    lineHeight: 32,
+    paddingBottom: "5%",
   },
   button: {
-    backgroundColor: '#4A4C34',
-    paddingHorizontal: 40,
+    backgroundColor: '#3B507D',
+    paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 25,
-    marginTop: 10,
+    marginTop: "1.5%",
     marginBottom: 10,
   },
   buttonText: {
     fontFamily: 'Raleway_500Medium',
     fontSize: 12,
     letterSpacing: 2,
-    color: '#FFFFFF',
-  },
-  info: {
-    fontFamily: 'Raleway_300Light_Italic',
-    fontSize: 11,
-    color: '#E8E8E8',
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 15,
+    color: '#F5F2EC',
   },
   // Landscape styles
-  contentLandscape: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    paddingRight: 80,
+
+  //portrait styles (if needed in the future)
+  buttonPortrait: {
+    paddingVertical: 8,
   },
-  textContainerLandscape: {
-    alignItems: 'flex-start',
-    backgroundColor: "transparent",
-    marginRight: 40,
-    maxWidth: 400,
+  buttonTextPortrait: {
+    fontSize: 8,
   },
-  timeLandscape: {
-    marginTop: "85%",
-    fontSize: 24,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    alignSelf: 'center',
-    marginBottom: 20,
+  contentPortrait: {
   },
-  venueNameLandscape: {
-    fontSize: 20,
-    fontFamily: 'Raleway_400Regular',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    alignSelf: 'center',
-    marginBottom: 25,
+  informationPortrait: {
+    width: '60%',
+    height: '20%',
   },
-  infoLandscape: {
-    fontSize: 13,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    alignSelf: 'center',
-    marginTop: 30,
-    marginBottom: 30,
+  monogramPortrait: {
   },
-  buttonLandscape: {
-    backgroundColor: '#4A4C34',
-    textAlign: 'center',
-    alignSelf: 'center',
+  infoPortrait: {
   },
-  buttonTextLandscape: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    alignSelf: 'center',
+  itineraryPortrait: {
+    width: '90%',
+    height: '100%',
   },
 });

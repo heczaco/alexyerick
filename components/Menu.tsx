@@ -35,20 +35,29 @@ function MenuButton({ id, active, currentPage, onPress, children, textVisible, o
   
   let buttonStyle = styles.menuButton;
   let circleStyle = styles.circle1;
+  let pageTextStyle = null;
+  let pageSeparatorStyle = null;
+  let pageCircleStyle = null;
+  let pageActiveCircleStyle = null;
   
   switch (currentPage) {
     case 'inicio':
     case 'regalos':
     case 'rsvp':
     case 'ceremonia':
-    case 'recepcion':
     case 'vestimenta':
+      break;
+    case 'recepcion':
+      pageTextStyle = styles.receptionText;
+      pageSeparatorStyle = styles.receptionSeparator;
+      pageCircleStyle = styles.receptionCircle;
+        pageActiveCircleStyle = styles.receptionActiveCircle;
       break;
   }
   
   const isActive = currentPage === id;
   const activeButtonStyle = isActive ? styles.activeButton : null;
-  const activeCircleStyle = isActive ? styles.activeCircle : null;
+  const activeCircleStyle = isActive ? pageActiveCircleStyle ?? styles.activeCircle : null;
   const isFirstButton = id === 'inicio';
   
   const handlePress = () => {
@@ -72,13 +81,14 @@ function MenuButton({ id, active, currentPage, onPress, children, textVisible, o
         activeButtonStyle,
         isLandscape && styles.landscapeButton,
         isLandscape && isFirstButton && styles.leftButMenu,
+        isLandscape && pageSeparatorStyle,
         !isLandscape && styles.portraitButton
       ]}
       onPress={handlePress}
       disabled={!active}
     >
       {isLandscape ? (
-        <Text style={[styles.buttonText, isActive && styles.activeButtonText]}>
+        <Text style={[styles.buttonText, pageTextStyle, isActive && styles.activeButtonText]}>
           {children}
         </Text>
       ) : (
@@ -86,6 +96,7 @@ function MenuButton({ id, active, currentPage, onPress, children, textVisible, o
           <Animated.Text 
             style={[
               styles.buttonTextPortrait, 
+              pageTextStyle,
               isActive && styles.activeButtonText,
               { 
                 transform: [{ translateX: slideAnim }],
@@ -98,7 +109,7 @@ function MenuButton({ id, active, currentPage, onPress, children, textVisible, o
           >
             {children}
           </Animated.Text>
-          <View style={[circleStyle, activeCircleStyle, styles.portraitCircle]} />
+          <View style={[circleStyle, pageCircleStyle, activeCircleStyle, styles.portraitCircle]} />
         </>
       )}
     </Pressable>
@@ -109,7 +120,7 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
   const [textVisible, setTextVisible] = useState(true);
-  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startHideTimer = () => {
     if (hideTimerRef.current) {
@@ -145,13 +156,14 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
   }, [isLandscape]);
   var currentCustomStyle = null;
   currentCustomStyle = {backgroundColor: 'transparent'};
+  var currentMonogram = require('@/assets/images/monogram_white.svg');
   switch (currentPage) {
     case 'inicio':
-      currentCustomStyle = {backgroundColor: 'transparent'};
       break;
     case 'ceremonia':
       break;
     case 'recepcion':
+      currentMonogram = require('@/assets/images/monogram_blue.svg');
       break;
     case 'vestimenta':
       break;
@@ -174,7 +186,7 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
       {isLandscape && (
         <View style={styles.logoMenu}>
           <Image 
-            source={require('@/assets/images/monogram_white.svg')}
+            source={currentMonogram}
             style={styles.logoImage}
             contentFit="contain"
           />
@@ -185,7 +197,7 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
           INICIO
         </MenuButton>
         <MenuButton id="ceremonia" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
-          CEREMONIA
+          CIVIL
         </MenuButton>
         <MenuButton id="recepcion" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
           RECEPCIÓN
@@ -197,11 +209,13 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
           INFORMACION
         </MenuButton>
         <MenuButton id="regalos" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
-          REGALOS
+          MESA DE REGALOS
         </MenuButton>
-        <MenuButton id="rsvp" active={rsvpActive} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
-          R.S.V.P
-        </MenuButton>
+        {rsvpActive && (
+          <MenuButton id="rsvp" active={true} currentPage={currentPage} onPress={onPageChange} textVisible={textVisible} onHover={showText}>
+            R.S.V.P
+          </MenuButton>
+        )}
       </View>
     </View>
   );
@@ -260,15 +274,21 @@ const styles = StyleSheet.create({
   leftButMenu: {
     borderLeftWidth: 0,
   },
+  receptionSeparator: {
+    borderLeftColor: '#112250',
+  },
   buttonText: {
     fontSize: 16,
     color: '#FFFFFF',
-    fontFamily: 'CormorantGaramond_400Regular',
+    fontFamily: 'CormorantGaramond_300Light_Italic',
     textAlign: 'center',
+  },
+  receptionText: {
+    color: '#112250',
   },
   activeButton: {},
   activeButtonText: {
-    fontFamily: 'CormorantGaramond_700Bold',
+    fontFamily: 'CormorantGaramond_700Bold_Italic',
   },
   
   // Portrait menu background styles (if needed in the future)
@@ -292,7 +312,7 @@ const styles = StyleSheet.create({
   buttonTextPortrait: {
     fontSize: 13,
     color: '#FFFFFF',
-    fontFamily: 'CormorantGaramond_400Regular',
+    fontFamily: 'CormorantGaramond_300Light_Italic',
     textAlign: 'left',
     width: "60%",
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -307,6 +327,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFFFFF',
     backgroundColor: 'transparent',
+  },
+  receptionCircle: {
+    borderColor: '#112250',
+  },
+  receptionActiveCircle: {
+    backgroundColor: '#112250',
   },
   activeCircle: {
     backgroundColor: '#FFFFFF',

@@ -1,6 +1,17 @@
 import { GuestProvider } from '@/contexts/GuestContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { CormorantGaramond_300Light } from '@expo-google-fonts/cormorant-garamond';
+import {
+  CormorantGaramond_300Light,
+  CormorantGaramond_300Light_Italic,
+  CormorantGaramond_400Regular,
+  CormorantGaramond_400Regular_Italic,
+  CormorantGaramond_500Medium,
+  CormorantGaramond_500Medium_Italic,
+  CormorantGaramond_600SemiBold,
+  CormorantGaramond_600SemiBold_Italic,
+  CormorantGaramond_700Bold,
+  CormorantGaramond_700Bold_Italic,
+} from '@expo-google-fonts/cormorant-garamond';
 import {
   Raleway_100Thin,
   Raleway_100Thin_Italic,
@@ -32,6 +43,15 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     CormorantGaramond_300Light,
+    CormorantGaramond_300Light_Italic,
+    CormorantGaramond_400Regular,
+    CormorantGaramond_400Regular_Italic,
+    CormorantGaramond_500Medium,
+    CormorantGaramond_500Medium_Italic,
+    CormorantGaramond_600SemiBold,
+    CormorantGaramond_600SemiBold_Italic,
+    CormorantGaramond_700Bold,
+    CormorantGaramond_700Bold_Italic,
     Raleway_100Thin,
     Raleway_100Thin_Italic,
     Raleway_200ExtraLight,
@@ -61,7 +81,7 @@ export default function RootLayout() {
     <GuestProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <meta property="og:title" content="Gisela e Israel ♡ 07 de Mayo del 2027" />
-      <meta property="og:description" content="Acompáñanos a escribir este capítulo" />
+      <meta property="og:description" content="Nuestra historia continúa. Sé parte de ella." />
       <meta property="og:image" content="https://gisela-e-israel.onrender.com/previewWhats.png" />
       <meta property="og:url" content="https://GiselaeIsrael.com" />
         <Stack screenOptions={{ headerShown: false }}>
