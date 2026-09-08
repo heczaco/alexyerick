@@ -24,7 +24,7 @@ export default function RegalosScreen() {
         resizeMode="cover"
       >
         <View style={[styles.content, !isLandscape && styles.contentPortrait]}>
-            <View style={[styles.monogramPortrait, !isLandscape && styles.monogramImagePortrait]}>
+            <View style={[styles.monogram, !isLandscape && styles.monogramPortrait]}>
               <Image
                 source={require('@/assets/images/monogram_white.svg')}
                 style={generalStyles.imageStd}
@@ -34,118 +34,117 @@ export default function RegalosScreen() {
             
           
             {/* Venue Name */}
-            <Text style={[styles.giftMessage, isLandscape && styles.giftMessageLandscape]}>
+            <Text style={[styles.giftMessage, !isLandscape && styles.giftMessagePortrait]}>
               Su presencia y compañía siempre va a ser nuestro
               mejor regalo. Sin embargo, si desean obsequiarnos
               algo más pueden hacerlo a través de:
             </Text>
   
-            <View style={[styles.giftContainer, isLandscape && styles.giftContainerLandscape]}>
-              <Pressable onPress={copyAccountNumber}>
+            <Pressable onPress={copyAccountNumber}>
+              <View style={[styles.giftContainer, !isLandscape && styles.giftContainerPortrait]}>
                 <Image
                     source={require('@/assets/images/regalos/cuenta.svg')}
-                    style={isLandscape ? styles.monogramImage2Landscape : styles.monogramImage2Portrait}
-                    contentFit="fill"
+                    style={generalStyles.imageStd}
+                    contentFit="contain"
                     />
-              </Pressable>
-            </View>
+              </View>
+            </Pressable>
+            <Text style={[styles.cuentaText, !isLandscape && styles.cuentaTextPortrait]}>
+              <Text style={styles.bold}> BBVA <br/></Text>
+              Gisela Guadalupe Sanchez Motilla<br/>
+              <Text style={styles.bold}>CUENTA<br/></Text>
+              153 940 9149<br/>
+              <Text style={styles.bold}>CLABE<br/></Text>
+              012 680 01539409149 0
+            </Text>
         </View>
       </ImageBackground>
     );
   }
   
   const styles = StyleSheet.create({
-    container: {
-    },
-    backgroundImage: {
-      width: '100%',
-      height: '100%',
-    },
+    container: {},
     content: {
       position: 'absolute',
       top: '20%',
-      left: '35%',
+      left: '10%',
       width: '30%',
-      height: '40%',
-      
-      backgroundColor: '#252836',
-      opacity: 0.75,
+      backgroundColor: '#252836BB',  
       borderRadius: 15,
       padding: 20,
       justifyContent: 'center',
     },
-    monogramPortrait: {
-      width: "25%",
-      height: "25%",
-      marginBottom: 10,
+    
+    monogram: {
+      width: '15%',
+      aspectRatio: 1,
+      marginTop: 30,
+      marginBottom: 30,
       alignSelf: 'center',
-    },
-    textContainer: {
-      alignItems: 'center',
-      backgroundColor: '#4A4C3488',
-      padding: 20,
-      borderRadius: 15,
-      width: '100%',
     },
     giftMessage: {
       fontFamily: 'Raleway_500Medium',
-      fontSize: 10,
+      fontSize: 18,
+      maxWidth: '80%',
       color: '#FFFFFF',
       textAlign: 'center',
+      alignSelf: 'center',
       marginBottom: 4,
       marginTop: 4,
     },
     giftContainer: {
+      opacity: 1,
+      marginTop: 10,
+      marginBottom: 10,
+      width: 50,
+      aspectRatio: 1,
+      alignSelf: 'center'
     },
-    // Portrait styles
-    
-    monogramImagePortrait: {
-      width: "30%",
-      height: 100,
+    cuentaText: {
+      fontSize: 13,
+      maxWidth: '80%',
+      color: '#FFFFFF',
+      textAlign: 'center',
       alignSelf: 'center',
-      marginTop:0,
-      marginLeft: "2%",
+      marginBottom: 4,
+      marginTop: 4,
     },
+    bold:{
+      
+      fontWeight: 'bold',
+    },
+    // 
     contentPortrait: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      paddingRight: 10,
+      backgroundColor:"transparent",
+      top: "0%",
+      left: "5%",
+      width: "90%",
     },
-    textContainerLandscape: {
-      alignItems: 'flex-start',
-      backgroundColor: '#transparent',
-      padding: 0,
-      marginRight: 0,
-      maxWidth: 600,
+    monogramPortrait: {
+      width: '25%',
+      aspectRatio: 1,
+      marginTop: 15,
+      marginBottom: 15,
+      alignSelf: 'center',
     },
-    giftMessageLandscape: {
+    giftMessagePortrait: {
       fontSize: 13,
       fontFamily: 'Raleway_500Medium',
       color: '#FFFFFF',
-      textShadowColor: 'rgba(0, 0, 0, 0.5)',
+      textShadowColor: 'black',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 1,
       textAlign: 'center',
       alignSelf: 'center',
-      marginBottom: 25,
-      width: '80%',
-    },
-    giftContainerLandscape: {
-      flexDirection: 'column',
+      marginBottom: 15,
       width: '100%',
-      justifyContent: 'center',
-      marginTop: 5,
+      maxWidth: "100%",
     },
-    monogramImage1Landscape: {
-      width: "25%",
-      height: 120,
-      alignSelf: 'center',
-      marginTop: 20,
-      marginLeft: "2%",
+    giftContainerPortrait: {
+      marginTop: 0,
     },
-    monogramImage2Landscape: {
-      width: "50%",
-      alignSelf: 'center',
-      height: 140,
+    cuentaTextPortrait: {
     },
   });
-
+  
+  
