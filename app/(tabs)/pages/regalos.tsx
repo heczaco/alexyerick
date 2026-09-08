@@ -9,7 +9,7 @@ export default function RegalosScreen() {
      const isLandscape = width > height;
 
      const copyAccountNumber = async () => {
-       await Clipboard.setStringAsync('5579209150641014');
+       await Clipboard.setStringAsync('012680015394091490');
        alert('Número de cuenta copiado al portapapeles');
      };
 
@@ -24,10 +24,10 @@ export default function RegalosScreen() {
         resizeMode="cover"
       >
         <View style={[styles.content, !isLandscape && styles.contentPortrait]}>
-            <View style={styles.monogramPortrait}>
+            <View style={[styles.monogramPortrait, !isLandscape && styles.monogramImagePortrait]}>
               <Image
                 source={require('@/assets/images/monogram_white.svg')}
-                style={styles.monogramImagePortrait}
+                style={generalStyles.imageStd}
                 contentFit="contain"
                 />
             </View>
@@ -47,11 +47,6 @@ export default function RegalosScreen() {
                     style={isLandscape ? styles.monogramImage2Landscape : styles.monogramImage2Portrait}
                     contentFit="fill"
                     />
-                <Image
-                    source={require('@/assets/images/regalos/sobre.svg')}
-                    style={isLandscape ? styles.monogramImage1Landscape : styles.monogramImage1Portrait}
-                    contentFit="fill"
-                    />
               </Pressable>
             </View>
         </View>
@@ -61,39 +56,29 @@ export default function RegalosScreen() {
   
   const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      backgroundColor: '#F8F5F0',
     },
     backgroundImage: {
       width: '100%',
       height: '100%',
     },
-    backgroundImagePortrait: {
-      height: '130%',
-      transform: [{ translateY: '0%' }],
-    },
     content: {
-      flex: 1,
       position: 'absolute',
-      top: '35%',
-      left: '30%',
+      top: '20%',
+      left: '35%',
+      width: '30%',
+      height: '40%',
       
-      width: '40%',
-      height: '30%',
-      marginLeft: "5%",
       backgroundColor: '#252836',
       opacity: 0.75,
+      borderRadius: 15,
+      padding: 20,
+      justifyContent: 'center',
     },
     monogramPortrait: {
       width: "25%",
-      height: "15%",
-      marginTop: "-10%",
+      height: "25%",
       marginBottom: 10,
       alignSelf: 'center',
-    },
-    monogramImagePortrait: {
-      width: '100%',
-      height: '100%',
     },
     textContainer: {
       alignItems: 'center',
@@ -111,25 +96,17 @@ export default function RegalosScreen() {
       marginTop: 4,
     },
     giftContainer: {
-      width: '100%',
-      height: "50%",
     },
-    monogramImage1Portrait: {
+    // Portrait styles
+    
+    monogramImagePortrait: {
       width: "30%",
       height: 100,
       alignSelf: 'center',
       marginTop:0,
       marginLeft: "2%",
     },
-    monogramImage2Portrait: {
-      width: "80%",
-      alignSelf: 'center',
-      height: 100,
-      marginTop: 15,
-    },
-    // Landscape styles
-    
-    contentLandscape: {
+    contentPortrait: {
       flexDirection: 'row',
       justifyContent: 'flex-end',
       alignItems: 'center',
