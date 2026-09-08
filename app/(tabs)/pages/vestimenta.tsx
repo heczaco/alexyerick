@@ -120,14 +120,31 @@ const styles = StyleSheet.create({
   },
   // Portrait styles
   contentPortrait: {
-  
+    paddingTop: "0%",
+    textAlign: 'left',
+    height: '60%',
+    width: '50%',
+    right: '0%',
   },
   titlePortrait: {
+    marginTop: "8%",
+    textAlign: 'left',
+    fontSize: 30,
   },
   dressCodePortrait: {
+    fontSize: 22,
+    textAlign: 'left',
   },
   dressCodeInfoPortrait: {
+    width: '100%',
+    fontSize: 16,
+    marginTop: 2,
+    marginBottom: 2,
+    maxWidth: '100%',
+    textAlign: 'left',
   },
   placePortrait: {
+    fontSize: 18,
+    textAlign: 'left',
   },
 });

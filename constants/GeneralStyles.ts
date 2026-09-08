@@ -17,4 +17,8 @@ export const generalStyles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  imageStd: {
+    width: '100%',
+    height: '100%',
+  },
 });

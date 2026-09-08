@@ -26,7 +26,7 @@ export default function RecepcionScreen() {
         <View style={[ styles.monogram, !isLandscape && styles.monogramPortrait]}>
           <Image
             source={require('@/assets/images/monogram_blue.svg')}
-            style={styles.imageStd}
+            style={generalStyles.imageStd}
             contentFit="contain"
             />
         </View>
@@ -35,7 +35,7 @@ export default function RecepcionScreen() {
         <View style={isLandscape ? styles.information : styles.informationPortrait}>
           <Image
             source={require('@/assets/images/recepcion/informacion.png')}
-            style={styles.imageStd}
+            style={generalStyles.imageStd}
             contentFit="contain"
             />
         </View>
@@ -54,7 +54,7 @@ export default function RecepcionScreen() {
         <View style={isLandscape ? styles.itinerary : styles.itineraryPortrait}>
           <Image
             source={require('@/assets/images/recepcion/itinerario.png')}
-            style={styles.imageStd}
+            style={generalStyles.imageStd}
             contentFit="contain"
             />
         </View>
@@ -81,10 +81,6 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     width: '100%',
-  },
-  imageStd: {
-    width: '100%',
-    height: '100%',
   },
   monogram: {
     marginTop: "4%",

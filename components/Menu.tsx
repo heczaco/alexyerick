@@ -48,6 +48,7 @@ function MenuButton({ id, active, currentPage, onPress, children, textVisible, o
       break;
     case 'vestimenta':
     case 'recepcion':
+    case 'informacion':
       pageTextStyle = styles.receptionText;
       pageSeparatorStyle = styles.receptionSeparator;
       pageCircleStyle = styles.receptionCircle;
@@ -160,11 +161,11 @@ export default function Menu({ currentPage, onPageChange, rsvpActive }: MenuProp
   switch (currentPage) {
     case 'inicio':
     case 'ceremonia':
-    case 'informacion':
     case 'regalos':
     case 'rsvp':
-   
-      break;
+          
+          break;
+    case 'informacion':
     case 'recepcion':
     case 'vestimenta':
       currentMonogram = require('@/assets/images/monogram_blue.svg');
