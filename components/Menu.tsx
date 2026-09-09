@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   portraitMenu: {
     flexDirection: 'column',
     right: '7%',
-    top: '74%',
+    top: '85%',
     transform: [{ translateY: -150 }],
     marginRight: -5,
     width: '40%',
