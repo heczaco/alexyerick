@@ -237,6 +237,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     letterSpacing: 4,
   },
+  portraitPlace: {
+  },
+  portraitText: {
+    
+  },
   portraitDate: {
     fontSize: 20,
   },
